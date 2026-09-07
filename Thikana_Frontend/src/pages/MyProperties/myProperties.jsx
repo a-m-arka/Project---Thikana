@@ -127,7 +127,7 @@ export default function MyProperties() {
   return (
     <div className="page properties-page">
       <div className="properties-page__header">
-        <div>
+        <div style={{marginBottom: "15px"}}>
           <p className="eyebrow">Your listings</p>
           <h1>My Properties</h1>
           <p>Manage property details, photos, and listing status in one place.</p>

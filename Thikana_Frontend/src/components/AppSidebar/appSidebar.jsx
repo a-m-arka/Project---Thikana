@@ -6,6 +6,7 @@ import {
   HiOutlineUserCircle,
 } from 'react-icons/hi2';
 import './appSidebar.scss';
+import logo from '../../assets/Thikana_logo_1.png';
 
 const links = [
   { to: '/app/home', label: 'Home', icon: HiOutlineHome },
@@ -17,7 +18,8 @@ export default function AppSidebar() {
   return (
     <aside className="sidebar">
       <NavLink className="sidebar__brand" to="/app/home">
-        <span>⌂</span> Thikana
+        <img src={logo} alt="Thikana Logo" />
+        {/* <span>⌂</span> Thikana */}
       </NavLink>
       <nav>
         {links.map(({ to, label, icon: Icon }) => (
