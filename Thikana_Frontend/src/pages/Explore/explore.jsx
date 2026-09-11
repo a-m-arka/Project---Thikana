@@ -1,22 +1,41 @@
 import { useEffect, useMemo, useState } from 'react';
+
 import PropertyCard from '../../components/PropertyCard/propertyCard';
 import { useAuth } from '../../context/AuthContext';
 import { toCardProperty } from '../../utils/propertyDisplay';
+
 import './explore.scss';
+
 import Loader from '../../components/Loader/loader';
 
 export default function Explore({ onMessageOwner }) {
   const { apiUrl, user } = useAuth();
-  const [filters, setFilters] = useState({ city: '', type: '', postType: '' });
+
+  const [filters, setFilters] = useState({
+    city: '',
+    type: '',
+    postType: '',
+  });
+
   const [listedProperties, setListedProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
+
     fetch(`${apiUrl}/post/posts`)
-      .then((response) => response.json().then((data) => ({ response, data })))
+      .then((response) =>
+        response.json().then((data) => ({ response, data }))
+      )
       .then(({ response, data }) => {
-        if (response.ok) setListedProperties((data.posts || []).map(toCardProperty));
+        if (response.ok) {
+          setListedProperties((data.posts || []).map(toCardProperty));
+        }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        setLoading(false);
+      });
   }, [apiUrl]);
 
   const properties = useMemo(
@@ -26,10 +45,11 @@ export default function Explore({ onMessageOwner }) {
           Number(p.user_id) !== Number(user?.user_id) &&
           (!filters.city || p.city === filters.city) &&
           (!filters.type || p.type === filters.type) &&
-          (!filters.postType || p.postType === filters.postType),
+          (!filters.postType || p.postType === filters.postType)
       ),
-    [filters, listedProperties, user?.user_id],
+    [filters, listedProperties, user?.user_id]
   );
+
   return (
     <div className="page explore">
       <div className="page-title">
@@ -37,48 +57,84 @@ export default function Explore({ onMessageOwner }) {
         <h1>Explore properties</h1>
         <p>Browse the latest spaces available to rent or buy.</p>
       </div>
+
       <section className="filters">
         <select
           value={filters.city}
-          onChange={(e) => setFilters({ ...filters, city: e.target.value })}
+          onChange={(e) =>
+            setFilters({ ...filters, city: e.target.value })
+          }
         >
           <option value="">Any city</option>
           <option>Dhaka</option>
           <option>Chattogram</option>
           <option>Rajshahi</option>
         </select>
+
         <select
           value={filters.type}
-          onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+          onChange={(e) =>
+            setFilters({ ...filters, type: e.target.value })
+          }
         >
           <option value="">Any type</option>
           <option>Flat</option>
           <option>House</option>
           <option>Commercial</option>
         </select>
+
         <select
           value={filters.postType}
-          onChange={(e) => setFilters({ ...filters, postType: e.target.value })}
+          onChange={(e) =>
+            setFilters({ ...filters, postType: e.target.value })
+          }
         >
           <option value="">Rent or sell</option>
           <option>Rent</option>
           <option>Sell</option>
         </select>
-        <button onClick={() => setFilters({ city: '', type: '', postType: '' })}>
+
+        <button
+          onClick={() =>
+            setFilters({
+              city: '',
+              type: '',
+              postType: '',
+            })
+          }
+        >
           Clear filters
         </button>
       </section>
-      {/* <Loader width="100%" height="200px" text="Loading properties" /> */}
-      <p className="results-label">{properties.length} properties found</p>
-      <div className="property-grid">
-        {properties.map((property) => (
-          <PropertyCard key={property.id} property={property} onMessageOwner={onMessageOwner} />
-        ))}
-      </div>
-      {!properties.length && (
-        <div className="empty-state">
-          No properties match these filters. Try a different search.
-        </div>
+
+      {loading ? (
+        <Loader
+          width="100%"
+          height="300px"
+          text="Loading Properties"
+        />
+      ) : (
+        <>
+          <p className="results-label">
+            {properties.length} properties found
+          </p>
+
+          <div className="property-grid">
+            {properties.map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                onMessageOwner={onMessageOwner}
+              />
+            ))}
+          </div>
+
+          {!properties.length && (
+            <div className="empty-state">
+              No properties match these filters. Try a different search.
+            </div>
+          )}
+        </>
       )}
     </div>
   );
