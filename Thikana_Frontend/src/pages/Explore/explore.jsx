@@ -3,6 +3,7 @@ import PropertyCard from '../../components/PropertyCard/propertyCard';
 import { useAuth } from '../../context/AuthContext';
 import { toCardProperty } from '../../utils/propertyDisplay';
 import './explore.scss';
+import Loader from '../../components/Loader/loader';
 
 export default function Explore({ onMessageOwner }) {
   const { apiUrl, user } = useAuth();
@@ -67,6 +68,7 @@ export default function Explore({ onMessageOwner }) {
           Clear filters
         </button>
       </section>
+      {/* <Loader width="100%" height="200px" text="Loading properties" /> */}
       <p className="results-label">{properties.length} properties found</p>
       <div className="property-grid">
         {properties.map((property) => (

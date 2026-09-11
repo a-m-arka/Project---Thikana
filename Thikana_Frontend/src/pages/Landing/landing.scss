@@ -7,35 +7,41 @@
   height: 76px;
   max-width: 1180px;
   margin: auto;
+  margin-top: 10px;
   padding: 0 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  // background-color: green;
 }
 .landing header > div {
   display: flex;
   align-items: center;
   gap: 20px;
   font-weight: 700;
+  // background-color: blue;
 }
 .landing__brand {
+  width: 60%;
   color: $primary-color;
   font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.8px;
+  // background-color: red;
 }
-.landing__brand span {
-  display: inline-grid;
+.landing__brand img {
+  display: grid;
+  width: 35%;
+  height: auto;
   place-items: center;
-  width: 31px;
-  height: 31px;
   border-radius: 9px;
-  background: $primary-color;
   color: white;
+  // background: $primary-color;
 }
 .landing main {
   max-width: 1180px;
   margin: auto;
+  margin-top: -20px; 
   padding: 68px 28px;
 }
 .landing__hero {

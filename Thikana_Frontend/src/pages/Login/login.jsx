@@ -2,6 +2,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import './login.scss';
+import logo from '../../assets/Thikana_logo_1.png'
 export default function Login() {
   const { token, login } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
@@ -27,7 +28,7 @@ export default function Login() {
     <section className="auth-page">
       <div className="auth-card">
         <Link className="auth-brand" to="/">
-          ⌂ Thikana
+          <img src={logo} alt="Thikana Logo" />
         </Link>
         <p className="eyebrow">Welcome back</p>
         <h1>Log in to continue</h1>

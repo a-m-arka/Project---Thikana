@@ -1,0 +1,180 @@
+@use '../../var.scss' as *;
+
+.thikana-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.thikana-loader__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.thikana-loader__house {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  animation: house-float 1.5s ease-in-out infinite;
+}
+
+/* Roof */
+.house__roof {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  width: 34px;
+  height: 34px;
+  border-top: 4px solid $primary-color;
+  border-left: 4px solid $primary-color;
+  border-radius: 3px;
+  transform: rotate(45deg);
+}
+
+/* House body */
+.house__body {
+  position: absolute;
+  bottom: 2px;
+  left: 8px;
+  width: 26px;
+  height: 25px;
+  background: $primary-color;
+  border-radius: 2px;
+}
+
+/* Door */
+.house__door {
+  position: absolute;
+  bottom: 0;
+  left: 9px;
+  width: 8px;
+  height: 13px;
+  background: $surface-color;
+  border-radius: 2px 2px 0 0;
+}
+
+/* Windows */
+.house__window {
+  position: absolute;
+  top: 6px;
+  width: 6px;
+  height: 6px;
+  background: $surface-color;
+  border-radius: 1px;
+}
+
+.house__window--left {
+  left: 4px;
+}
+
+.house__window--right {
+  right: 4px;
+}
+
+/* Chimney */
+.house__chimney {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  width: 6px;
+  height: 13px;
+  background: $primary-dark;
+  border-radius: 1px;
+}
+
+/* Loading line */
+.thikana-loader__line {
+  position: relative;
+  width: 58px;
+  height: 5px;
+  margin-top: 8px;
+  overflow: hidden;
+  background: $border-color;
+  border-radius: 10px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -25px;
+    width: 25px;
+    height: 100%;
+    background: $primary-dark;
+    border-radius: 10px;
+    animation: loading-line 1.2s ease-in-out infinite;
+  }
+}
+
+/* Loading text */
+.thikana-loader__text {
+  display: flex;
+  align-items: baseline;
+  margin-top: 7px;
+  color: $muted-text-color;
+  font-family: inherit;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.thikana-loader__dots {
+  display: inline-flex;
+  width: 14px;
+  margin-left: 1px;
+  overflow: hidden;
+
+  span {
+    opacity: 0;
+    animation: dot-animation 1.4s infinite;
+  }
+
+  span:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+}
+
+/* House movement */
+@keyframes house-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Moving loading line */
+@keyframes loading-line {
+  0% {
+    left: -25px;
+  }
+
+  100% {
+    left: 58px;
+  }
+}
+
+/* Loading dots */
+@keyframes dot-animation {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  40%,
+  70% {
+    opacity: 1;
+  }
+}

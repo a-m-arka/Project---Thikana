@@ -21,6 +21,15 @@
   font-size: 22px;
   font-weight: 800;
 }
+.auth-brand img {
+  display: grid;
+  width: 80%;
+  height: auto;
+  place-items: center;
+  border-radius: 9px;
+  color: white;
+  // background: $primary-color;
+}
 .auth-card h1 {
   margin: 6px 0;
   font-size: 30px;

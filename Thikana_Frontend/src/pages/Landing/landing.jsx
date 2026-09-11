@@ -2,6 +2,8 @@ import { Link, Navigate } from 'react-router-dom';
 import { HiArrowRight, HiCheckCircle, HiOutlineBuildingOffice2 } from 'react-icons/hi2';
 import { useAuth } from '../../context/AuthContext';
 import './landing.scss';
+import logo from '../../assets/Thikana_logo_1.png';
+
 export default function Landing() {
   const { token } = useAuth();
   if (token) return <Navigate to="/app/home" replace />;
@@ -9,7 +11,7 @@ export default function Landing() {
     <div className="landing">
       <header>
         <Link className="landing__brand" to="/">
-          <span>⌂</span> Thikana
+          <img src={logo} alt="Thikana Logo" />
         </Link>
         <div>
           <Link to="/login">Log in</Link>
