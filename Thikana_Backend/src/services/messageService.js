@@ -42,6 +42,12 @@ export const getConversations = async (userId) => {
   return rows;
 };
 
+export const markMessageDelivered = async (messageId) => {
+  await pool.query(messageQueries.markMessageDelivered, [messageId]);
+  const [rows] = await pool.query(messageQueries.getMessageById, [messageId]);
+  return rows[0];
+};
+
 export const getConversation = async (
   userId,
   otherUserId,

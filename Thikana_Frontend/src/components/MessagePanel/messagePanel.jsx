@@ -1,19 +1,56 @@
 import { useCallback, useEffect, useState } from 'react';
-import { HiOutlineArrowLeft, HiOutlinePaperAirplane, HiOutlineXMark } from 'react-icons/hi2';
+import {
+  HiOutlineArrowLeft,
+  HiOutlinePaperAirplane,
+  HiOutlineXMark,
+} from 'react-icons/hi2';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import './messagePanel.scss';
 
 const formatTime = (value) => {
   if (!value) return '';
-  return new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit' }).format(
-    new Date(value),
-  );
+
+  return new Intl.DateTimeFormat([], {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(value));
+};
+
+const calendarDayKey = (value) => {
+  const date = new Date(value);
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+};
+
+const formatDateSeparator = (value) => {
+  const date = new Date(value);
+  const today = new Date();
+
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  if (calendarDayKey(date) === calendarDayKey(today)) return 'Today';
+
+  if (calendarDayKey(date) === calendarDayKey(yesterday)) return 'Yesterday';
+
+  return new Intl.DateTimeFormat([], {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+};
+
+const messageStatus = (status) => {
+  if (status === 'read') return 'Seen';
+  if (status === 'delivered') return 'Delivered';
+
+  return 'Sent';
 };
 
 export default function MessagePanel({ onClose, initialConversation }) {
-  const { apiUrl, token } = useAuth();
+  const { apiUrl, token, user } = useAuth();
   const socket = useSocket();
+
   const [conversations, setConversations] = useState([]);
   const [selected, setSelected] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -24,10 +61,18 @@ export default function MessagePanel({ onClose, initialConversation }) {
     async (path, options = {}) => {
       const response = await fetch(`${apiUrl}${path}`, {
         ...options,
-        headers: { Authorization: `Bearer ${token}`, ...(options.headers || {}) },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...(options.headers || {}),
+        },
       });
+
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Unable to load messages');
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to load messages');
+      }
+
       return data;
     },
     [apiUrl, token],
@@ -48,8 +93,10 @@ export default function MessagePanel({ onClose, initialConversation }) {
 
   useEffect(() => {
     if (!socket) return undefined;
+
     const receiveMessage = (message) => {
       loadConversations();
+
       if (
         selected &&
         (Number(message.sender_id) === Number(selected.other_user_id) ||
@@ -60,22 +107,50 @@ export default function MessagePanel({ onClose, initialConversation }) {
             ? current
             : [...current, message],
         );
+
         if (Number(message.sender_id) === Number(selected.other_user_id)) {
-          socket.emit('message:read', { otherUserId: selected.other_user_id });
+          socket.emit('message:read', {
+            otherUserId: selected.other_user_id,
+          });
         }
       }
     };
+
+    const updateReadStatus = ({ readerId }) => {
+      setMessages((current) =>
+        current.map((message) =>
+          Number(message.sender_id) === Number(user?.user_id) &&
+          Number(message.receiver_id) === Number(readerId)
+            ? { ...message, read_status: 'read' }
+            : message,
+        ),
+      );
+    };
+
     socket.on('message:new', receiveMessage);
-    return () => socket.off('message:new', receiveMessage);
-  }, [socket, selected, loadConversations]);
+    socket.on('message:read', updateReadStatus);
+
+    return () => {
+      socket.off('message:new', receiveMessage);
+      socket.off('message:read', updateReadStatus);
+    };
+  }, [socket, selected, loadConversations, user?.user_id]);
 
   const openConversation = async (conversation) => {
     setSelected(conversation);
     setError('');
+
     try {
-      const data = await request(`/messages/conversations/${conversation.other_user_id}`);
+      const data = await request(
+        `/messages/conversations/${conversation.other_user_id}`,
+      );
+
       setMessages(data.data || []);
-      socket?.emit('message:read', { otherUserId: conversation.other_user_id });
+
+      socket?.emit('message:read', {
+        otherUserId: conversation.other_user_id,
+      });
+
       loadConversations();
     } catch (err) {
       setError(err.message);
@@ -83,25 +158,39 @@ export default function MessagePanel({ onClose, initialConversation }) {
   };
 
   useEffect(() => {
-    if (initialConversation) openConversation(initialConversation);
+    if (initialConversation) {
+      openConversation(initialConversation);
+    }
   }, [initialConversation]);
 
   const sendMessage = (event) => {
     event.preventDefault();
+
     const text = draft.trim();
+
     if (!text || !selected || !socket) return;
+
     setError('');
+
     socket.emit(
       'message:send',
-      { receiverId: selected.other_user_id, postId: selected.post_id, text },
+      {
+        receiverId: selected.other_user_id,
+        postId: selected.post_id,
+        text,
+      },
       (result) => {
-        if (!result?.ok) setError(result?.message || 'Unable to send message');
+        if (!result?.ok) {
+          setError(result?.message || 'Unable to send message');
+        }
       },
     );
+
     setDraft('');
   };
 
-  const isMine = (message) => Number(message.sender_id) !== Number(selected?.other_user_id);
+  const isMine = (message) =>
+    Number(message.sender_id) === Number(user?.user_id);
 
   return (
     <section className="message-panel" aria-label="Messages">
@@ -120,8 +209,14 @@ export default function MessagePanel({ onClose, initialConversation }) {
             <h2>Messages</h2>
           </div>
         )}
+
         {selected && <h2>{selected.other_user_name}</h2>}
-        <button className="message-panel__close" onClick={onClose} title="Close messages">
+
+        <button
+          className="message-panel__close"
+          onClick={onClose}
+          title="Close messages"
+        >
           <HiOutlineXMark />
         </button>
       </header>
@@ -139,41 +234,85 @@ export default function MessagePanel({ onClose, initialConversation }) {
               <span className="conversation__avatar">
                 {conversation.other_user_name?.slice(0, 1).toUpperCase()}
               </span>
+
               <span className="conversation__copy">
                 <strong>{conversation.other_user_name}</strong>
                 <small>{conversation.message_text}</small>
               </span>
+
               <time>{formatTime(conversation.sent_at)}</time>
             </button>
           ))}
-          {!conversations.length && <p className="message-panel__empty">No conversations yet.</p>}
+
+          {!conversations.length && (
+            <p className="message-panel__empty">No conversations yet.</p>
+          )}
         </div>
       ) : (
         <>
           <div className="message-panel__thread">
-            {messages.map((message) => (
-              <div
-                key={message.message_id}
-                className={`message-bubble ${isMine(message) ? 'message-bubble--mine' : ''}`}
-              >
-                <span>{message.message_text}</span>
-                <time>{formatTime(message.sent_at)}</time>
-              </div>
-            ))}
+            {messages.map((message, index) => {
+              const showDate =
+                index === 0 ||
+                calendarDayKey(message.sent_at) !==
+                  calendarDayKey(messages[index - 1].sent_at);
+
+              const mine = isMine(message);
+
+              return (
+                <div
+                  key={message.message_id}
+                  className={`message-panel__message-group ${
+                    mine ? 'message-panel__message-group--mine' : ''
+                  }`}
+                >
+                  {showDate && (
+                    <div className="message-date-separator">
+                      <span>{formatDateSeparator(message.sent_at)}</span>
+                    </div>
+                  )}
+
+                  <div
+                    className={`message-bubble ${
+                      mine ? 'message-bubble--mine' : ''
+                    }`}
+                  >
+                    <span>{message.message_text}</span>
+                    <time>{formatTime(message.sent_at)}</time>
+                  </div>
+
+                  {mine && (
+                    <small className="message-bubble__status">
+                      {messageStatus(message.read_status)}
+                    </small>
+                  )}
+                </div>
+              );
+            })}
+
             {!messages.length && (
               <p className="message-panel__empty">
                 Send the first message to {selected.other_user_name}.
               </p>
             )}
           </div>
-          <form className="message-panel__composer" onSubmit={sendMessage}>
+
+          <form
+            className="message-panel__composer"
+            onSubmit={sendMessage}
+          >
             <input
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               placeholder={`Message ${selected.other_user_name}`}
               maxLength="5000"
             />
-            <button type="submit" disabled={!draft.trim() || !socket} title="Send message">
+
+            <button
+              type="submit"
+              disabled={!draft.trim() || !socket}
+              title="Send message"
+            >
               <HiOutlinePaperAirplane />
             </button>
           </form>

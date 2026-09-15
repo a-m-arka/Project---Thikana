@@ -41,6 +41,11 @@ const messageQueries = {
         SET read_status = 'read'
         WHERE sender_id = ? AND receiver_id = ? AND read_status <> 'read';
     `,
+  markMessageDelivered: `
+        UPDATE Messages
+        SET read_status = 'delivered'
+        WHERE message_id = ? AND read_status = 'unread';
+    `,
 };
 
 export default messageQueries;

@@ -15,6 +15,7 @@
   background: #fff;
   box-shadow: 0 18px 45px rgba(20, 38, 34, 0.18);
 }
+
 .message-panel__header {
   min-height: 70px;
   display: flex;
@@ -24,6 +25,7 @@
   padding: 12px 16px;
   border-bottom: 1px solid $border-color;
 }
+
 .message-panel__header p {
   margin: 0;
   color: $muted-text-color;
@@ -32,13 +34,16 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+
 .message-panel__header h2 {
   margin: 2px 0 0;
   font-size: 18px;
 }
+
 .message-panel__header > h2 {
   margin-right: auto;
 }
+
 .message-panel__close,
 .message-panel__back {
   display: grid;
@@ -51,16 +56,58 @@
   color: $muted-text-color;
   font-size: 21px;
 }
+
 .message-panel__close:hover,
 .message-panel__back:hover {
   background: $primary-light;
   color: $primary-dark;
 }
+
 .message-panel__list,
 .message-panel__thread {
   flex: 1;
   overflow-y: auto;
 }
+
+.message-panel__thread {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 16px;
+  background: $background-color;
+}
+
+.message-panel__message-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.message-panel__message-group--mine {
+  align-items: flex-end;
+}
+
+.message-date-separator {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 2px;
+  color: $muted-text-color;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.message-date-separator::before,
+.message-date-separator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: $border-color;
+}
+
 .conversation {
   width: 100%;
   display: flex;
@@ -72,9 +119,11 @@
   background: #fff;
   text-align: left;
 }
+
 .conversation:hover {
   background: $background-color;
 }
+
 .conversation__avatar {
   display: grid;
   flex: 0 0 auto;
@@ -86,34 +135,32 @@
   color: $primary-dark;
   font-weight: 800;
 }
+
 .conversation__copy {
   min-width: 0;
   display: grid;
   gap: 3px;
 }
+
 .conversation__copy strong {
   font-size: 14px;
   color: $text-color;
 }
+
 .conversation__copy small {
   overflow: hidden;
   color: $muted-text-color;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .conversation time {
   margin-left: auto;
   align-self: flex-start;
   color: $muted-text-color;
   font-size: 11px;
 }
-.message-panel__thread {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  padding: 16px;
-  background: $background-color;
-}
+
 .message-bubble {
   align-self: flex-start;
   max-width: 80%;
@@ -125,24 +172,35 @@
   color: $text-color;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
 }
+
 .message-bubble--mine {
   align-self: flex-end;
   border-radius: 12px 12px 3px 12px;
   background: $primary-color;
   color: white;
 }
+
 .message-bubble time {
   color: inherit;
   opacity: 0.7;
   font-size: 10px;
   text-align: right;
 }
+
+.message-bubble__status {
+  color: $muted-text-color;
+  font-size: 10px;
+  line-height: 1;
+  text-align: right;
+}
+
 .message-panel__composer {
   display: flex;
   gap: 8px;
   padding: 12px;
   border-top: 1px solid $border-color;
 }
+
 .message-panel__composer input {
   flex: 1;
   min-width: 0;
@@ -151,9 +209,11 @@
   border-radius: 9px;
   outline: none;
 }
+
 .message-panel__composer input:focus {
   border-color: $primary-color;
 }
+
 .message-panel__composer button {
   display: grid;
   place-items: center;
@@ -164,21 +224,25 @@
   color: #fff;
   font-size: 18px;
 }
+
 .message-panel__composer button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
+
 .message-panel__empty,
 .message-panel__error {
   margin: 20px;
   color: $muted-text-color;
   text-align: center;
 }
+
 .message-panel__error {
   margin: 8px 16px 0;
   color: $danger-color;
   font-size: 13px;
 }
+
 @media (max-width: 560px) {
   .message-panel {
     top: 60px;

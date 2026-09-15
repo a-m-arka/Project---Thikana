@@ -2,6 +2,7 @@ import { verifyToken } from "./utils/authUtils.js";
 import {
   createMessage,
   markConversationRead,
+  markMessageDelivered,
 } from "./services/messageService.js";
 
 const userRoom = (userId) => `user:${userId}`;
@@ -24,7 +25,15 @@ export default function configureSocketServer(io) {
 
     socket.on("message:send", async (payload, acknowledgement = () => {}) => {
       try {
-        const message = await createMessage(userId, payload || {});
+        let message = await createMessage(userId, payload || {});
+        const recipientSockets = await io
+          .in(userRoom(message.receiver_id))
+          .fetchSockets();
+
+        if (recipientSockets.length) {
+          message = await markMessageDelivered(message.message_id);
+        }
+
         io.to(userRoom(message.sender_id))
           .to(userRoom(message.receiver_id))
           .emit("message:new", message);
