@@ -1,5 +1,5 @@
 import {
-  HiOutlineBell,
+  // HiOutlineBell,
   HiOutlineChatBubbleOvalLeft,
   HiOutlineMagnifyingGlass,
   HiOutlineArrowRightOnRectangle,
@@ -19,9 +19,9 @@ export default function Navbar({ messagesOpen, onMessagesOpenChange, messageTarg
         <input placeholder="Search properties" />
       </label>
       <div className="navbar__actions">
-        <button title="Notifications" className="icon-button">
+        {/* <button title="Notifications" className="icon-button">
           <HiOutlineBell />
-        </button>
+        </button> */}
         <button
           title="Messages"
           className="icon-button"
