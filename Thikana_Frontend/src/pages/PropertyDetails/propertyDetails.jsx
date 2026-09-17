@@ -12,13 +12,19 @@ export default function PropertyDetails({ onMessageOwner }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`${apiUrl}/property/properties/${propertyId}`)
-      .then((response) => response.json().then((data) => ({ response, data })))
-      .then(({ response, data }) => {
+    const loadProperty = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/property/properties/${propertyId}`);
+        const data = await response.json();
+
         if (!response.ok) throw new Error(data.message || 'Unable to load this property');
         setProperty(toCardProperty(data.property));
-      })
-      .catch((err) => setError(err.message));
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    loadProperty();
   }, [apiUrl, propertyId]);
 
   if (error) {

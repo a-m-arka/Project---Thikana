@@ -23,4 +23,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-MESSAGE_FEATURE.txt
+MESSAGE_FEATURE.md

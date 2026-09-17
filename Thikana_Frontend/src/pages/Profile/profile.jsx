@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import './profile.scss';
 export default function Profile() {
   const { token, apiUrl, user, updateUser } = useAuth();
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -11,9 +12,13 @@ export default function Profile() {
   });
   const [message, setMessage] = useState('');
   useEffect(() => {
-    fetch(`${apiUrl}/user/get-user-data`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.json())
-      .then((data) => {
+    const loadUserData = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/user/get-user-data`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+
         if (data.data) {
           updateUser(data.data);
           setForm({
@@ -23,12 +28,17 @@ export default function Profile() {
             address: data.data.address || '',
           });
         }
-      })
-      .catch(() => {});
+      } catch {
+        // Preserve the original silent failure behavior.
+      }
+    };
+
+    loadUserData();
   }, [apiUrl, token]);
   const submit = async (e) => {
     e.preventDefault();
     try {
+      setSaving(true);
       const r = await fetch(`${apiUrl}/user/edit-profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -40,6 +50,8 @@ export default function Profile() {
       setMessage(data.message);
     } catch (err) {
       setMessage(err.message);
+    } finally {
+      setSaving(false);
     }
   };
   return (
@@ -80,7 +92,9 @@ export default function Profile() {
           </label>
         </div>
         {message && <p className="notice">{message}</p>}
-        <button className="button">Save changes</button>
+        <button className="button" disabled={saving}>
+          {saving ? 'Saving...' : 'Save changes'}
+        </button>
       </form>
     </div>
   );

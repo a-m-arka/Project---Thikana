@@ -21,21 +21,24 @@ export default function Explore({ onMessageOwner }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
+    const loadProperties = async () => {
+      setLoading(true);
 
-    fetch(`${apiUrl}/post/posts`)
-      .then((response) =>
-        response.json().then((data) => ({ response, data }))
-      )
-      .then(({ response, data }) => {
+      try {
+        const response = await fetch(`${apiUrl}/post/posts`);
+        const data = await response.json();
+
         if (response.ok) {
           setListedProperties((data.posts || []).map(toCardProperty));
         }
-      })
-      .catch(() => {})
-      .finally(() => {
+      } catch {
+        // Preserve the original silent failure behavior.
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    loadProperties();
   }, [apiUrl]);
 
   const properties = useMemo(

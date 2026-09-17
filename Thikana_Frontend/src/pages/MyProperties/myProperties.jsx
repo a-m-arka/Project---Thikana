@@ -31,6 +31,8 @@ export default function MyProperties() {
 
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [registeringProperty, setRegisteringProperty] = useState(false);
+  const [editingProperty, setEditingProperty] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [files, setFiles] = useState([]);
@@ -39,20 +41,22 @@ export default function MyProperties() {
   const [postingPropertyId, setPostingPropertyId] = useState(null);
   const [postType, setPostType] = useState('rent');
 
-  const loadProperties = useCallback(() => {
+  const loadProperties = useCallback(async () => {
     setLoading(true);
 
-    return fetch(`${apiUrl}/property/user-properties`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((data) => setProperties(data.properties || []))
-      .catch(() =>
-        setMessage(
-          'Could not load your properties. Is the backend running?'
-        )
-      )
-      .finally(() => setLoading(false));
+    try {
+      const response = await fetch(`${apiUrl}/property/user-properties`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setProperties(data.properties || []);
+    } catch {
+      setMessage(
+        'Could not load your properties. Is the backend running?'
+      );
+    } finally {
+      setLoading(false);
+    }
   }, [apiUrl, token]);
 
   useEffect(() => {
@@ -66,6 +70,7 @@ export default function MyProperties() {
       let r;
 
       if (editingId) {
+        setEditingProperty(true);
         r = await fetch(
           `${apiUrl}/property/update-property/${editingId}`,
           {
@@ -78,6 +83,7 @@ export default function MyProperties() {
           }
         );
       } else {
+        setRegisteringProperty(true);
         const data = new FormData();
 
         Object.entries(form).forEach(([key, value]) => {
@@ -110,6 +116,9 @@ export default function MyProperties() {
       loadProperties();
     } catch (err) {
       setMessage(err.message);
+    } finally {
+      setRegisteringProperty(false);
+      setEditingProperty(false);
     }
   };
 
@@ -314,8 +323,9 @@ export default function MyProperties() {
             />
           </label>
 
-          <button className="button">
-            {editingId ? 'Save changes' : 'Save property'}
+          <button className="button" disabled={registeringProperty || editingProperty}>
+            {editingId ? (editingProperty ? 'Saving...' : 'Save changes')
+              : (registeringProperty ? 'Registering...' : 'Register property')}
           </button>
         </form>
       )}
