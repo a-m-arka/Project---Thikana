@@ -5,12 +5,12 @@ import {
   HiOutlinePlus,
   HiOutlinePencilSquare,
   HiOutlineTrash,
+  HiOutlineXMark,
 } from 'react-icons/hi2';
 
 import { useAuth } from '../../context/AuthContext';
 
 import PropertyCard from '../../components/PropertyCard/propertyCard';
-
 import Loader from '../../components/Loader/loader';
 
 import { toCardProperty } from '../../utils/propertyDisplay';
@@ -31,13 +31,18 @@ export default function MyProperties() {
 
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [registeringProperty, setRegisteringProperty] = useState(false);
-  const [editingProperty, setEditingProperty] = useState(null);
+  const [editingProperty, setEditingProperty] = useState(false);
+
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
+
   const [files, setFiles] = useState([]);
   const [message, setMessage] = useState('');
+
   const [editingId, setEditingId] = useState(null);
+
   const [postingPropertyId, setPostingPropertyId] = useState(null);
   const [postType, setPostType] = useState('rent');
 
@@ -46,9 +51,13 @@ export default function MyProperties() {
 
     try {
       const response = await fetch(`${apiUrl}/property/user-properties`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       const data = await response.json();
+
       setProperties(data.properties || []);
     } catch {
       setMessage(
@@ -67,11 +76,12 @@ export default function MyProperties() {
     e.preventDefault();
 
     try {
-      let r;
+      let response;
 
       if (editingId) {
         setEditingProperty(true);
-        r = await fetch(
+
+        response = await fetch(
           `${apiUrl}/property/update-property/${editingId}`,
           {
             method: 'PUT',
@@ -84,34 +94,38 @@ export default function MyProperties() {
         );
       } else {
         setRegisteringProperty(true);
+
         const data = new FormData();
 
         Object.entries(form).forEach(([key, value]) => {
           data.append(key, value);
         });
 
-        files.forEach((file) => data.append('files', file));
-
-        r = await fetch(`${apiUrl}/property/register-property`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: data,
+        files.forEach((file) => {
+          data.append('files', file);
         });
+
+        response = await fetch(
+          `${apiUrl}/property/register-property`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: data,
+          }
+        );
       }
 
-      const result = await r.json();
+      const result = await response.json();
 
-      if (!r.ok) {
+      if (!response.ok) {
         throw new Error(result.message);
       }
 
       setMessage(result.message);
-      setShowForm(false);
-      setEditingId(null);
-      setForm(emptyForm);
-      setFiles([]);
+
+      closeForm();
 
       loadProperties();
     } catch (err) {
@@ -166,6 +180,7 @@ export default function MyProperties() {
       }
 
       setMessage(result.message);
+
       loadProperties();
     } catch (err) {
       setMessage(err.message);
@@ -175,7 +190,7 @@ export default function MyProperties() {
   const closeForm = () => {
     setShowForm(false);
     setEditingId(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm });
     setFiles([]);
   };
 
@@ -201,6 +216,7 @@ export default function MyProperties() {
 
       setMessage(result.message);
       setPostingPropertyId(null);
+
       loadProperties();
     } catch (err) {
       setMessage(err.message);
@@ -212,7 +228,9 @@ export default function MyProperties() {
       <div className="properties-page__header">
         <div style={{ marginBottom: '15px' }}>
           <p className="eyebrow">Your listings</p>
+
           <h1>My Properties</h1>
+
           <p>
             Manage property details, photos, and listing status in one
             place.
@@ -225,66 +243,102 @@ export default function MyProperties() {
             showForm ? closeForm() : setShowForm(true)
           }
         >
-          <HiOutlinePlus /> Add Property
+          <HiOutlinePlus />
+          Add Property
         </button>
       </div>
 
       {showForm && (
         <form className="property-form" onSubmit={submit}>
-          <h2>{editingId ? 'Edit property' : 'Add a property'}</h2>
+          <h2>
+            {editingId ? 'Edit property' : 'Add a property'}
+
+            <span
+              onClick={closeForm}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  closeForm();
+                }
+              }}
+            >
+              <HiOutlineXMark />
+            </span>
+          </h2>
 
           <div className="form-grid">
             <label>
               Title
+
               <input
                 required
                 value={form.title}
                 onChange={(e) =>
-                  setForm({ ...form, title: e.target.value })
+                  setForm({
+                    ...form,
+                    title: e.target.value,
+                  })
                 }
               />
             </label>
 
             <label>
               Address
+
               <input
                 required
                 value={form.address}
                 onChange={(e) =>
-                  setForm({ ...form, address: e.target.value })
+                  setForm({
+                    ...form,
+                    address: e.target.value,
+                  })
                 }
               />
             </label>
 
             <label>
               City
+
               <input
                 required
                 value={form.city}
                 onChange={(e) =>
-                  setForm({ ...form, city: e.target.value })
+                  setForm({
+                    ...form,
+                    city: e.target.value,
+                  })
                 }
               />
             </label>
 
             <label>
               Price
+
               <input
                 type="number"
                 required
                 value={form.price}
                 onChange={(e) =>
-                  setForm({ ...form, price: e.target.value })
+                  setForm({
+                    ...form,
+                    price: e.target.value,
+                  })
                 }
               />
             </label>
 
             <label>
               Property type
+
               <select
                 value={form.type}
                 onChange={(e) =>
-                  setForm({ ...form, type: e.target.value })
+                  setForm({
+                    ...form,
+                    type: e.target.value,
+                  })
                 }
               >
                 <option value="flat">Flat</option>
@@ -296,13 +350,16 @@ export default function MyProperties() {
             {!editingId && (
               <label>
                 Images (up to 10)
+
                 <input
                   type="file"
                   required
                   accept="image/*"
                   multiple
                   onChange={(e) =>
-                    setFiles([...e.target.files].slice(0, 10))
+                    setFiles(
+                      [...e.target.files].slice(0, 10)
+                    )
                   }
                 />
               </label>
@@ -311,6 +368,7 @@ export default function MyProperties() {
 
           <label>
             Description
+
             <textarea
               required
               value={form.description}
@@ -323,9 +381,17 @@ export default function MyProperties() {
             />
           </label>
 
-          <button className="button" disabled={registeringProperty || editingProperty}>
-            {editingId ? (editingProperty ? 'Saving...' : 'Save changes')
-              : (registeringProperty ? 'Registering...' : 'Register property')}
+          <button
+            className="button"
+            disabled={registeringProperty || editingProperty}
+          >
+            {editingId
+              ? editingProperty
+                ? 'Saving...'
+                : 'Save changes'
+              : registeringProperty
+                ? 'Registering...'
+                : 'Register property'}
           </button>
         </form>
       )}
@@ -362,12 +428,16 @@ export default function MyProperties() {
                         <option value="sell">Sell</option>
                       </select>
 
-                      <button onClick={() => createPost(p)}>
+                      <button
+                        onClick={() => createPost(p)}
+                      >
                         Confirm post
                       </button>
 
                       <button
-                        onClick={() => setPostingPropertyId(null)}
+                        onClick={() =>
+                          setPostingPropertyId(null)
+                        }
                       >
                         Cancel
                       </button>

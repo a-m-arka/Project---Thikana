@@ -23,6 +23,26 @@
 }
 .property-form h2 {
   margin: 0;
+  // background-color: red;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  span {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    // background-color: $primary-light;
+    color: $primary-dark;
+    font-size: 28px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $primary-light;
+    }
+  }
 }
 .form-grid {
   display: grid;
