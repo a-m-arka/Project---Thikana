@@ -29,8 +29,11 @@ Project - Thikana/
 ├── Thikana_Backend/
 │   ├── app.js                 # Express and Socket.IO entry point
 │   └── src/
+│       ├── config/            # Database, Cloudinary, and upload setup
 │       ├── controllers/       # HTTP request handlers
+│       ├── middleware/        # Shared JWT authentication middleware
 │       ├── services/          # Business logic
+│       ├── models/            # Data model modules
 │       ├── queries/           # SQL queries and table definitions
 │       ├── routes/            # REST routes
 │       ├── socket.js          # Authenticated Socket.IO events
@@ -116,10 +119,17 @@ All routes are prefixed with `/api`. Routes marked as authenticated require `Aut
 | POST | `/auth/login-user` | Login and receive JWT | No |
 | GET | `/user/get-user-data` | Current user profile | Yes |
 | PUT | `/user/edit-profile` | Update profile | Yes |
+| PUT | `/user/update-profile-picture` | Upload profile picture | Yes |
+| PUT | `/user/change-password` | Change password | Yes |
 | POST | `/property/register-property` | Add a property and images | Yes |
 | GET | `/property/user-properties` | Current user’s properties and post status | Yes |
 | PUT | `/property/update-property/:propertyId` | Edit a property | Yes |
 | DELETE | `/property/delete-property/:propertyId` | Delete a property | Yes |
+| POST | `/property/add-new-images/:propertyId` | Add property images | Yes |
+| DELETE | `/property/delete-images/:propertyId` | Delete property images | Yes |
+| POST | `/image/upload-image` | Upload a generic image | Yes |
+| POST | `/image/upload-multiple-images` | Upload multiple generic images | Yes |
+| DELETE | `/image/delete-image` | Delete an owned property image by Cloudinary public ID | Yes |
 | GET | `/property/properties/:propertyId` | Complete property details and gallery | No |
 | POST | `/post/create-post/:propertyId` | Publish as `rent` or `sell` | Yes |
 | GET | `/post/posts` | Published-post feed | No |
@@ -127,6 +137,8 @@ All routes are prefixed with `/api`. Routes marked as authenticated require `Aut
 | GET | `/messages/conversations` | Conversation summaries | Yes |
 | GET | `/messages/conversations/:otherUserId` | Conversation history | Yes |
 | PATCH | `/messages/conversations/:otherUserId/read` | Mark a conversation read | Yes |
+
+Conversation history returns the newest page first and supports a `before` message-ID cursor for loading older messages. Each returned page remains chronological for display.
 
 ## Socket.IO Events
 

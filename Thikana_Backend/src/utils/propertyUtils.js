@@ -195,6 +195,23 @@ export const checkPropertyImageOwnership = async (propertyId, imageId) => {
   }
 };
 
+export const getOwnedPropertyImage = async (publicId, userId) => {
+  const query = propertyQueries.getOwnedPropertyImage;
+  const values = [publicId, userId];
+
+  try {
+    const [images] = await pool.query(query, values);
+    return { success: true, image: images[0] || null };
+  } catch (error) {
+    console.error("Error checking image ownership in database:", error);
+    return {
+      success: false,
+      message: "Error checking ownership of image",
+      error,
+    };
+  }
+};
+
 export const countPropertyImages = async (propertyId) => {
   const query = propertyQueries.countPropertyImages;
   const values = [propertyId];

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   HiOutlineArrowLeft,
   HiOutlinePaperAirplane,
@@ -54,8 +54,14 @@ export default function MessagePanel({ onClose, initialConversation }) {
   const [conversations, setConversations] = useState([]);
   const [selected, setSelected] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [pagination, setPagination] = useState({
+    hasMore: false,
+    nextCursor: null,
+  });
+  const [loadingOlder, setLoadingOlder] = useState(false);
   const [draft, setDraft] = useState('');
   const [error, setError] = useState('');
+  const threadRef = useRef(null);
 
   const request = useCallback(
     async (path, options = {}) => {
@@ -139,6 +145,7 @@ export default function MessagePanel({ onClose, initialConversation }) {
   const openConversation = async (conversation) => {
     setSelected(conversation);
     setError('');
+    setPagination({ hasMore: false, nextCursor: null });
 
     try {
       const data = await request(
@@ -146,6 +153,12 @@ export default function MessagePanel({ onClose, initialConversation }) {
       );
 
       setMessages(data.data || []);
+      setPagination(data.pagination || { hasMore: false, nextCursor: null });
+      requestAnimationFrame(() => {
+        if (threadRef.current) {
+          threadRef.current.scrollTop = threadRef.current.scrollHeight;
+        }
+      });
 
       socket?.emit('message:read', {
         otherUserId: conversation.other_user_id,
@@ -154,6 +167,32 @@ export default function MessagePanel({ onClose, initialConversation }) {
       loadConversations();
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const loadOlderMessages = async (event) => {
+    const thread = event.currentTarget;
+    if (!pagination.hasMore || !pagination.nextCursor || loadingOlder) return;
+
+    const previousHeight = thread.scrollHeight;
+    setLoadingOlder(true);
+
+    try {
+      const data = await request(
+        `/messages/conversations/${selected.other_user_id}?before=${pagination.nextCursor}`,
+      );
+      const olderMessages = data.data || [];
+
+      setMessages((current) => [...olderMessages, ...current]);
+      setPagination(data.pagination || { hasMore: false, nextCursor: null });
+
+      requestAnimationFrame(() => {
+        thread.scrollTop += thread.scrollHeight - previousHeight;
+      });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoadingOlder(false);
     }
   };
 
@@ -250,7 +289,18 @@ export default function MessagePanel({ onClose, initialConversation }) {
         </div>
       ) : (
         <>
-          <div className="message-panel__thread">
+          <div
+            ref={threadRef}
+            className="message-panel__thread"
+            onScroll={(event) => {
+              if (event.currentTarget.scrollTop <= 24) {
+                loadOlderMessages(event);
+              }
+            }}
+          >
+            {loadingOlder && (
+              <p className="message-panel__history-status">Loading older messages...</p>
+            )}
             {messages.map((message, index) => {
               const showDate =
                 index === 0 ||

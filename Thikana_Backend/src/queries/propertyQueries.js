@@ -127,6 +127,13 @@ const propertyQueries = {
         WHERE property_id = ? AND cloudinary_public_id = ?;
     `,
 
+    getOwnedPropertyImage: `
+                SELECT pi.image_id, pi.property_id, pi.cloudinary_public_id
+                FROM Property_Images pi
+                INNER JOIN Properties p ON p.property_id = pi.property_id
+                WHERE pi.cloudinary_public_id = ? AND p.user_id = ?;
+        `,
+
   countPropertyImages: `
         SELECT COUNT(*) AS image_count
         FROM Property_Images

@@ -38,10 +38,14 @@ export const deleteImage = async (req, res) => {
             return res.status(400).json({ message: "Public ID is required" });
         }
 
-        const result = await imageService.deleteImage(publicId);
+        if (!req.user?.id) {
+            return res.status(401).json({ message: "Authentication required" });
+        }
+
+        const result = await imageService.deleteImage(publicId, req.user.id);
 
         res.status(200).json({ message: "Image deleted successfully", result });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(error.statusCode || 500).json({ message: error.message });
     }
 };

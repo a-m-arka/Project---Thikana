@@ -30,13 +30,16 @@ export const listConversations = async (req, res) => {
 
 export const getConversation = async (req, res) => {
   try {
-    const messages = await messageService.getConversation(
+    const conversation = await messageService.getConversation(
       getUserId(req),
       req.params.otherUserId,
-      req.query.page,
+      req.query.before,
       req.query.limit,
     );
-    return res.json({ data: messages });
+    return res.json({
+      data: conversation.messages,
+      pagination: conversation.pagination,
+    });
   } catch (error) {
     return respondError(res, error);
   }

@@ -53,6 +53,7 @@ route -> controller -> service -> utility/query -> MySQL
 Directories:
 
 - `src/config/`: `db.js`, Cloudinary setup, Multer setup.
+- `src/middleware/`: shared JWT authentication middleware (`authMiddleware.js`).
 - `src/routes/`: route declarations only.
 - `src/controllers/`: request parsing, token extraction, HTTP response mapping.
 - `src/services/`: business rules and ownership checks.
@@ -61,7 +62,7 @@ Directories:
 - `src/models/`: `userModel.js`, `propertyModel.js`.
 - `src/socket.js`: JWT-authenticated Socket.IO handlers.
 
-There is no centralized auth middleware or global error middleware. Existing controllers/services usually extract `Authorization: Bearer <token>` and call `getUserFromToken`.
+Route-level JWT authentication is centralized in `src/middleware/authMiddleware.js`; it validates the Bearer token and attaches the decoded payload to `req.user`. Existing controllers/services still extract the raw token and call `getUserFromToken`, so both layers currently run during the migration. There is no global error middleware.
 
 ## Database Schema
 
@@ -147,6 +148,8 @@ All endpoints are prefixed with `/api`. Authenticated endpoints expect `Authoriz
 - `GET /property/properties`: public all-property query; not used by the current main frontend flow.
 - `GET /property/properties/:propertyId`: public property detail query with owner/post/images.
 
+Generic `DELETE /image/delete-image` is authenticated and only deletes a Cloudinary public ID when it belongs to a `Property_Images` row linked to a property owned by the JWT user. It also removes that database row after Cloudinary deletion. Generic uploads are not persisted as property images and therefore cannot be deleted through this endpoint.
+
 ### Posts
 
 - `POST /post/create-post/:propertyId`: authenticated owner-only JSON `{ postType: 'rent'|'sell' }`; rejects already-posted properties.
@@ -156,7 +159,7 @@ All endpoints are prefixed with `/api`. Authenticated endpoints expect `Authoriz
 ### Messages
 
 - `GET /messages/conversations`: authenticated conversation summaries.
-- `GET /messages/conversations/:otherUserId`: authenticated history; optional pagination is handled by the service (`page`, `limit` defaults 1/50 where supported).
+- `GET /messages/conversations/:otherUserId`: authenticated history; returns the newest page in chronological order. Use optional `before=<message_id>` and `limit` query parameters to load older pages; response includes `pagination.hasMore` and `pagination.nextCursor`.
 - `PATCH /messages/conversations/:otherUserId/read`: authenticated mark received messages read.
 
 Message sending is Socket.IO-only in the current client.
@@ -280,18 +283,18 @@ Backend `npm test` is a placeholder and exits with an error. No automated tests,
 6. For new frontend API calls, use `AuthContext.apiUrl` and include the Bearer token where required.
 7. For real-time features, update both Socket.IO server handlers and `SocketContext`/consumer subscriptions.
 8. When project behavior, setup, architecture, or workflows change, update both root Markdown files, `README.md` and `AI_CONTEXT.md`, as needed.
-9. Validate with `npm run build` for frontend changes; manually test backend/API changes because no test suite exists.
-10. Do not commit `.env` or reveal credentials.
+9. Remove hazards from this document once they are fixed; keep only unresolved hazards and update their wording to match the current implementation.
+10. Validate with `npm run build` for frontend changes; manually test backend/API changes because no test suite exists.
+11. Do not commit `.env` or reveal credentials.
 
 ## Known Hazards / Incomplete Areas
 
-- No centralized authentication, validation, error handling, rate limiting, or security headers.
-- Generic image routes require authorization review.
+- Request validation, global error handling, rate limiting, and security headers are still not centralized.
+- Controllers still repeat raw-token extraction while the middleware migration is incomplete.
 - Public property endpoints may expose unpublished/private properties.
 - Post uniqueness is enforced only by application logic and can race.
 - Property/image workflows are not transactional.
 - `postId` on messages is not fully checked against conversation context.
-- Conversation pagination is oldest-first (`ORDER BY sent_at ASC`), which may be unsuitable for large histories.
 - Password-change validation historically uses exactly eight characters despite an “at least 8” message; verify before changing related behavior.
 - Search UI is currently visual only.
 - Explore city filters are hard-coded.

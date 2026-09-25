@@ -10,15 +10,26 @@ const messageQueries = {
         JOIN Users receiver ON receiver.user_id = m.receiver_id
         WHERE m.message_id = ?;
     `,
-  getConversation: `
+  getLatestConversation: `
         SELECT m.*, sender.name AS sender_name, receiver.name AS receiver_name
         FROM Messages m
         JOIN Users sender ON sender.user_id = m.sender_id
         JOIN Users receiver ON receiver.user_id = m.receiver_id
         WHERE ((m.sender_id = ? AND m.receiver_id = ?)
             OR (m.sender_id = ? AND m.receiver_id = ?))
-        ORDER BY m.sent_at ASC, m.message_id ASC
-        LIMIT ? OFFSET ?;
+        ORDER BY m.message_id DESC
+        LIMIT ?;
+    `,
+  getConversationBefore: `
+        SELECT m.*, sender.name AS sender_name, receiver.name AS receiver_name
+        FROM Messages m
+        JOIN Users sender ON sender.user_id = m.sender_id
+        JOIN Users receiver ON receiver.user_id = m.receiver_id
+        WHERE ((m.sender_id = ? AND m.receiver_id = ?)
+            OR (m.sender_id = ? AND m.receiver_id = ?))
+          AND m.message_id < ?
+        ORDER BY m.message_id DESC
+        LIMIT ?;
     `,
   getConversations: `
         SELECT m.*, other_user.user_id AS other_user_id,

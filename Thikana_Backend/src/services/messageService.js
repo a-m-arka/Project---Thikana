@@ -51,25 +51,38 @@ export const markMessageDelivered = async (messageId) => {
 export const getConversation = async (
   userId,
   otherUserId,
-  page = 1,
+  before,
   limit = 50,
 ) => {
   const otherId = normalizeId(otherUserId);
   if (!Number.isInteger(otherId) || otherId < 1 || otherId === userId) {
     throw new Error("A valid conversation participant is required");
   }
-  const safePage = Math.max(1, normalizeId(page) || 1);
   const safeLimit = Math.min(100, Math.max(1, normalizeId(limit) || 50));
-  const [messages] = await pool.query(messageQueries.getConversation, [
-    userId,
-    otherId,
-    otherId,
-    userId,
-    safeLimit,
-    (safePage - 1) * safeLimit,
-  ]);
+  const cursor = before ? normalizeId(before) : null;
+  if (before && (!Number.isInteger(cursor) || cursor < 1)) {
+    throw new Error("Invalid message cursor");
+  }
+
+  const query = cursor
+    ? messageQueries.getConversationBefore
+    : messageQueries.getLatestConversation;
+  const values = [userId, otherId, otherId, userId];
+  if (cursor) values.push(cursor);
+  values.push(safeLimit + 1);
+
+  const [rows] = await pool.query(query, values);
+  const hasMore = rows.length > safeLimit;
+  const messages = rows.slice(0, safeLimit).reverse();
   await pool.query(messageQueries.markConversationRead, [otherId, userId]);
-  return messages;
+
+  return {
+    messages,
+    pagination: {
+      hasMore,
+      nextCursor: hasMore ? messages[0]?.message_id || null : null,
+    },
+  };
 };
 
 export const markConversationRead = async (userId, otherUserId) => {
