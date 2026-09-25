@@ -357,12 +357,18 @@ export default function MyProperties() {
             <PropertyCard
               key={p.property_id}
               property={toCardProperty(p)}
+              primaryAction={
+                p.post_id ? (
+                  <span className="property-card__posted">
+                    Posted for {p.post_type}
+                  </span>
+                ) : null
+              }
+              detailsInActions={Boolean(p.post_id)}
               actions={
                 <>
                   {p.post_id ? (
-                    <span className="property-card__posted">
-                      Posted for {p.post_type}
-                    </span>
+                    null
                   ) : postingPropertyId === p.property_id ? (
                     <div className="property-card__post-controls">
                       <select

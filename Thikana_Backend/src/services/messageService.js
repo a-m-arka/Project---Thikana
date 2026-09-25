@@ -38,6 +38,7 @@ export const getConversations = async (userId) => {
     userId,
     userId,
     userId,
+    userId,
   ]);
   return rows;
 };

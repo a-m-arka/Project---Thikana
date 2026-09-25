@@ -34,7 +34,14 @@ const messageQueries = {
   getConversations: `
         SELECT m.*, other_user.user_id AS other_user_id,
             other_user.name AS other_user_name,
-            other_user.profile_picture_url AS other_user_profile_picture_url
+            other_user.profile_picture_url AS other_user_profile_picture_url,
+            (
+              SELECT COUNT(*)
+              FROM Messages unread_message
+              WHERE unread_message.sender_id = other_user.user_id
+                AND unread_message.receiver_id = ?
+                AND unread_message.read_status <> 'read'
+            ) AS unread_count
         FROM Messages m
         JOIN Users other_user ON other_user.user_id =
             CASE WHEN m.sender_id = ? THEN m.receiver_id ELSE m.sender_id END

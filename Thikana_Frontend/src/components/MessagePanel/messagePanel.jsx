@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   HiOutlineArrowLeft,
+  HiOutlineArrowDown,
   HiOutlinePaperAirplane,
   HiOutlineXMark,
 } from 'react-icons/hi2';
@@ -61,7 +62,33 @@ export default function MessagePanel({ onClose, initialConversation }) {
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [draft, setDraft] = useState('');
   const [error, setError] = useState('');
+  const [showLatestButton, setShowLatestButton] = useState(false);
   const threadRef = useRef(null);
+
+  const isThreadAtBottom = () => {
+    const thread = threadRef.current;
+    if (!thread) return true;
+
+    return thread.scrollHeight - thread.scrollTop - thread.clientHeight <= 32;
+  };
+
+  const scrollThreadToBottom = () => {
+    requestAnimationFrame(() => {
+      if (threadRef.current) {
+        threadRef.current.scrollTop = threadRef.current.scrollHeight;
+      }
+    });
+  };
+
+  const handleThreadScroll = (event) => {
+    const thread = event.currentTarget;
+    const atBottom = thread.scrollHeight - thread.scrollTop - thread.clientHeight <= 32;
+    setShowLatestButton(!atBottom);
+
+    if (thread.scrollTop <= 24) {
+      loadOlderMessages(event);
+    }
+  };
 
   const request = useCallback(
     async (path, options = {}) => {
@@ -101,6 +128,7 @@ export default function MessagePanel({ onClose, initialConversation }) {
 
     const receiveMessage = (message) => {
       loadConversations();
+      const shouldStickToBottom = isThreadAtBottom();
 
       if (
         selected &&
@@ -112,6 +140,8 @@ export default function MessagePanel({ onClose, initialConversation }) {
             ? current
             : [...current, message],
         );
+
+          if (shouldStickToBottom) scrollThreadToBottom();
 
         if (Number(message.sender_id) === Number(selected.other_user_id)) {
           socket.emit('message:read', {
@@ -153,11 +183,8 @@ export default function MessagePanel({ onClose, initialConversation }) {
 
       setMessages(data.data || []);
       setPagination(data.pagination || { hasMore: false, nextCursor: null });
-      requestAnimationFrame(() => {
-        if (threadRef.current) {
-          threadRef.current.scrollTop = threadRef.current.scrollHeight;
-        }
-      });
+      setShowLatestButton(false);
+      scrollThreadToBottom();
 
       socket?.emit('message:read', {
         otherUserId: conversation.other_user_id,
@@ -225,6 +252,7 @@ export default function MessagePanel({ onClose, initialConversation }) {
     );
 
     setDraft('');
+    scrollThreadToBottom();
   };
 
   const isMine = (message) =>
@@ -288,19 +316,16 @@ export default function MessagePanel({ onClose, initialConversation }) {
         </div>
       ) : (
         <>
-          <div
-            ref={threadRef}
-            className="message-panel__thread"
-            onScroll={(event) => {
-              if (event.currentTarget.scrollTop <= 24) {
-                loadOlderMessages(event);
-              }
-            }}
-          >
-            {loadingOlder && (
-              <p className="message-panel__history-status">Loading older messages...</p>
-            )}
-            {messages.map((message, index) => {
+          <div className="message-panel__thread-container">
+            <div
+              ref={threadRef}
+              className="message-panel__thread"
+              onScroll={handleThreadScroll}
+            >
+              {loadingOlder && (
+                <p className="message-panel__history-status">Loading older messages...</p>
+              )}
+              {messages.map((message, index) => {
               const showDate =
                 index === 0 ||
                 calendarDayKey(message.sent_at) !==
@@ -308,41 +333,53 @@ export default function MessagePanel({ onClose, initialConversation }) {
 
               const mine = isMine(message);
 
-              return (
-                <div
-                  key={message.message_id}
-                  className={`message-panel__message-group ${
-                    mine ? 'message-panel__message-group--mine' : ''
-                  }`}
-                >
-                  {showDate && (
-                    <div className="message-date-separator">
-                      <span>{formatDateSeparator(message.sent_at)}</span>
-                    </div>
-                  )}
-
+                return (
                   <div
-                    className={`message-bubble ${
-                      mine ? 'message-bubble--mine' : ''
+                    key={message.message_id}
+                    className={`message-panel__message-group ${
+                      mine ? 'message-panel__message-group--mine' : ''
                     }`}
                   >
-                    <span>{message.message_text}</span>
-                    <time>{formatTime(message.sent_at)}</time>
+                    {showDate && (
+                      <div className="message-date-separator">
+                        <span>{formatDateSeparator(message.sent_at)}</span>
+                      </div>
+                    )}
+
+                    <div
+                      className={`message-bubble ${
+                        mine ? 'message-bubble--mine' : ''
+                      }`}
+                    >
+                      <span>{message.message_text}</span>
+                      <time>{formatTime(message.sent_at)}</time>
+                    </div>
+
+                    {mine && (
+                      <small className="message-bubble__status">
+                        {messageStatus(message.read_status)}
+                      </small>
+                    )}
                   </div>
+                );
+              })}
 
-                  {mine && (
-                    <small className="message-bubble__status">
-                      {messageStatus(message.read_status)}
-                    </small>
-                  )}
-                </div>
-              );
-            })}
-
-            {!messages.length && (
-              <p className="message-panel__empty">
-                Send the first message to {selected.other_user_name}.
-              </p>
+              {!messages.length && (
+                <p className="message-panel__empty">
+                  Send the first message to {selected.other_user_name}.
+                </p>
+              )}
+            </div>
+            {showLatestButton && (
+              <button
+                type="button"
+                className="message-panel__latest-button"
+                onClick={scrollThreadToBottom}
+                title="Jump to latest message"
+                aria-label="Jump to latest message"
+              >
+                <HiOutlineArrowDown />
+              </button>
             )}
           </div>
 

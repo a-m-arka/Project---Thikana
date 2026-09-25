@@ -51,9 +51,11 @@ export default function configureSocketServer(io) {
       async ({ otherUserId } = {}, acknowledgement = () => {}) => {
         try {
           await markConversationRead(userId, otherUserId);
-          io.to(userRoom(otherUserId)).emit("message:read", {
-            readerId: userId,
-          });
+          io.to(userRoom(otherUserId))
+            .to(userRoom(userId))
+            .emit("message:read", {
+              readerId: userId,
+            });
           acknowledgement({ ok: true });
         } catch (error) {
           acknowledgement({

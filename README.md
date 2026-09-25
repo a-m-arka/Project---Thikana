@@ -13,7 +13,11 @@ Thikana (ঠিকানা — Bangla for “address”) is a full-stack real-e
 - Property-name search is available above the Explore filters
 - Full property-details pages with description, listing facts, owner details, and every uploaded image
 - Real-time messaging through Socket.IO, with MySQL-backed history and read status
+- Navbar message icon shows the total unread message count
+- Message threads stay on the latest message unless the user scrolls up to read older history
+- A down-arrow control lets users jump back to the latest message
 - Property-card actions for details, messaging an owner, posting, editing, and deleting
+- Published cards in My Properties show posting status prominently, with details available in the secondary actions
 - Responsive app shell with a full-width navbar and centered mobile navigation
 
 ## Tech Stack
@@ -155,7 +159,7 @@ The frontend connects with the JWT in `auth.token`. The server verifies it and a
 | Client → Server | `message:send` | `receiverId`, optional `postId`, `text` |
 | Server → Client | `message:new` | Persisted message object |
 | Client → Server | `message:read` | `otherUserId` |
-| Server → Client | `message:read` | Reader information |
+| Server → Client | `message:read` | Reader information, emitted to both participants |
 
 ## Database Tables
 

@@ -69,12 +69,42 @@
   overflow-y: auto;
 }
 
+.message-panel__thread-container {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
 .message-panel__thread {
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 9px;
   padding: 16px;
   background: $background-color;
+}
+
+.message-panel__latest-button {
+  position: absolute;
+  z-index: 2;
+  bottom: 12px;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid $border-color;
+  border-radius: 50%;
+  background: $surface-color;
+  color: $primary-dark;
+  box-shadow: $shadow;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.message-panel__latest-button:hover {
+  background: $primary-light;
 }
 
 .message-panel__message-group {

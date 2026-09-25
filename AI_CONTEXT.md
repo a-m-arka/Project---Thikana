@@ -193,7 +193,7 @@ Client -> server:
 Server -> client:
 
 - `message:new`: persisted message object, emitted to sender and receiver rooms.
-- `message:read`: `{ readerId }`, emitted to the other participant.
+- `message:read`: `{ readerId }`, emitted to both conversation participants so read state and unread badges refresh.
 
 `createMessage` validates integer recipient, prevents self-messaging, trims text, requires 1-5000 characters, and optionally validates numeric `postId`. Sender identity always comes from the authenticated socket, not the payload.
 
@@ -231,8 +231,12 @@ Important components:
 - `AppSidebar`: app navigation below the desktop navbar; becomes a centered, evenly spaced bottom navigation bar on small screens.
 - `Navbar`: full-width top bar with the brand logo, messages toggle, profile control, and logout action.
 - `PropertyCard`: card rendering, details link, owner-message action, owner actions.
+- Published My Properties cards pass `primaryAction` for posting status and `detailsInActions` to place the details link in the secondary action row.
 - `EditProperty`: detail-style owner editor; saves details, deletes owned images, and adds images up to the 10-image limit.
 - `MessagePanel`: inbox and conversation thread.
+- Navbar unread badge sums `unread_count` from conversation summaries and refreshes on Socket.IO message/read events.
+- `MessagePanel` auto-scrolls to the latest message when the thread is at the bottom; it preserves the user's position when they scroll upward.
+- When scrolled away from the bottom, `MessagePanel` shows an icon-only jump-to-latest button.
 - `Loader`: loading state.
 
 `propertyDisplay.js` converts backend rows into card data and parses JSON image aggregation. Keep its output fields compatible with `PropertyCard`:

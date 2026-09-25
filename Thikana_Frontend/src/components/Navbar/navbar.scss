@@ -50,6 +50,29 @@
   font-size: 22px;
 }
 
+.navbar__messages {
+  position: relative;
+  font-size: 25px;
+}
+
+.navbar__unread-badge {
+  position: absolute;
+  top: -3px;
+  right: -5px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 2px solid $surface-color;
+  border-radius: 999px;
+  background: $danger-color;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .icon-button:hover {
   background: $primary-light;
   color: $primary-dark;

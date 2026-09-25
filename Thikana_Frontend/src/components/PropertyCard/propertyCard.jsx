@@ -1,7 +1,13 @@
 import { HiOutlineChatBubbleLeft, HiOutlineMapPin } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import './propertyCard.scss';
-export default function PropertyCard({ property, onMessageOwner, actions }) {
+export default function PropertyCard({
+  property,
+  onMessageOwner,
+  actions,
+  primaryAction,
+  detailsInActions = false,
+}) {
   return (
     <article className="property-card">
       <div className="property-card__image">
@@ -19,12 +25,15 @@ export default function PropertyCard({ property, onMessageOwner, actions }) {
           <small>{property.postType === 'Rent' ? ' / month' : ''}</small>
         </p>
         <div className="property-card__primary-actions">
-          <Link
-            className="property-card__details"
-            to={`/app/properties/${property.property_id || property.id}`}
-          >
-            See details
-          </Link>
+          {primaryAction}
+          {!detailsInActions && (
+            <Link
+              className="property-card__details"
+              to={`/app/properties/${property.property_id || property.id}`}
+            >
+              See details
+            </Link>
+          )}
           {onMessageOwner && (
             <button
               className="property-card__message"
@@ -40,7 +49,19 @@ export default function PropertyCard({ property, onMessageOwner, actions }) {
             </button>
           )}
         </div>
-        {actions && <div className="property-card__actions">{actions}</div>}
+        {actions && (
+          <div className="property-card__actions">
+            {detailsInActions && (
+              <Link
+                className="property-card__details"
+                to={`/app/properties/${property.property_id || property.id}`}
+              >
+                See details
+              </Link>
+            )}
+            {actions}
+          </div>
+        )}
       </div>
     </article>
   );
