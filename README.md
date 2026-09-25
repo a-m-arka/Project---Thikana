@@ -4,21 +4,13 @@ Thikana (ঠিকানা — Bangla for “address”) is a full-stack real-e
 
 ## Features
 
-- JWT-based registration, login, profile editing, and protected frontend routes
-- Property management: create, edit, and delete properties; upload up to 10 Cloudinary images
-- Dedicated property editing page with editable details, per-image deletion, and add-image controls capped at 10 images
-- City selection uses a shared list of 20 major Bangladeshi cities in the property form and Explore filters
-- Publish workflow: a property appears publicly only after its owner posts it for rent or sale
-- Explore feed that displays published posts only
-- Property-name search is available above the Explore filters
-- Full property-details pages with description, listing facts, owner details, and every uploaded image
-- Real-time messaging through Socket.IO, with MySQL-backed history and read status
-- Navbar message icon shows the total unread message count
-- Message threads stay on the latest message unless the user scrolls up to read older history
-- A down-arrow control lets users jump back to the latest message
-- Property-card actions for details, messaging an owner, posting, editing, and deleting
-- Published cards in My Properties show posting status prominently, with details available in the secondary actions
-- Responsive app shell with a full-width navbar and centered mobile navigation
+- Secure user authentication with profile management and protected application routes
+- Property creation and management with Cloudinary image storage
+- Private property listings that can be published for rent or sale
+- Published-property discovery with search and location/type filters
+- Detailed property pages with listing information, owner details, and image galleries
+- Real-time user messaging with persistent history, read status, and unread indicators
+- Responsive application interface for desktop and mobile users
 
 ## Tech Stack
 
