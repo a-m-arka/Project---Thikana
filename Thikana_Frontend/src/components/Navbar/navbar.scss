@@ -3,9 +3,9 @@
 .navbar {
   position: fixed;
   top: 0;
-  left: $sidebar-width;
+  left: 0;
   right: 0;
-  z-index: 10;
+  z-index: 30;
   height: 64px;
   display: flex;
   align-items: center;
@@ -16,24 +16,26 @@
   backdrop-filter: blur(12px);
 }
 
-.navbar__search {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: $muted-text-color;
-}
-
-.navbar__search input {
-  width: 220px;
+.navbar__brand {
+  display: block;
+  width: 170px;
+  padding: 0;
   border: 0;
   background: transparent;
-  outline: 0;
+  cursor: pointer;
+}
+
+.navbar__brand img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .navbar__actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-left: auto;
 }
 
 .icon-button {
@@ -94,8 +96,8 @@
     padding: 0 16px;
   }
 
-  .navbar__search input {
-    width: 130px;
+  .navbar__brand {
+    width: 135px;
   }
 
   .navbar__user strong,

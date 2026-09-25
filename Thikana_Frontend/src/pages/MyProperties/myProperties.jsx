@@ -2,16 +2,18 @@ import { useCallback, useEffect, useState } from 'react';
 
 import {
   HiOutlineArrowUpOnSquare,
-  HiOutlinePlus,
   HiOutlinePencilSquare,
+  HiOutlinePlus,
   HiOutlineTrash,
   HiOutlineXMark,
 } from 'react-icons/hi2';
 
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 import PropertyCard from '../../components/PropertyCard/propertyCard';
 import Loader from '../../components/Loader/loader';
+import { bangladeshCities } from '../../data/cities';
 
 import { toCardProperty } from '../../utils/propertyDisplay';
 
@@ -33,15 +35,11 @@ export default function MyProperties() {
   const [loading, setLoading] = useState(true);
 
   const [registeringProperty, setRegisteringProperty] = useState(false);
-  const [editingProperty, setEditingProperty] = useState(false);
-
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
   const [files, setFiles] = useState([]);
   const [message, setMessage] = useState('');
-
-  const [editingId, setEditingId] = useState(null);
 
   const [postingPropertyId, setPostingPropertyId] = useState(null);
   const [postType, setPostType] = useState('rent');
@@ -56,9 +54,7 @@ export default function MyProperties() {
 
       setProperties(data.properties || []);
     } catch {
-      setMessage(
-        'Could not load your properties. Is the backend running?'
-      );
+      setMessage('Could not load your properties. Is the backend running?');
     } finally {
       setLoading(false);
     }
@@ -74,38 +70,25 @@ export default function MyProperties() {
     try {
       let response;
 
-      if (editingId) {
-        setEditingProperty(true);
+      setRegisteringProperty(true);
 
-        response = await authenticatedFetch(
-          `${apiUrl}/property/update-property/${editingId}`,
-          {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(form),
-          }
-        );
-      } else {
-        setRegisteringProperty(true);
+      const data = new FormData();
 
-        const data = new FormData();
+      Object.entries(form).forEach(([key, value]) => {
+        data.append(key, value);
+      });
 
-        Object.entries(form).forEach(([key, value]) => {
-          data.append(key, value);
-        });
+      files.forEach((file) => {
+        data.append('files', file);
+      });
 
-        files.forEach((file) => {
-          data.append('files', file);
-        });
-
-        response = await authenticatedFetch(
-          `${apiUrl}/property/register-property`,
-          {
-            method: 'POST',
-            body: data,
-          }
-        );
-      }
+      response = await authenticatedFetch(
+        `${apiUrl}/property/register-property`,
+        {
+          method: 'POST',
+          body: data,
+        }
+      );
 
       const result = await response.json();
 
@@ -122,25 +105,7 @@ export default function MyProperties() {
       setMessage(err.message);
     } finally {
       setRegisteringProperty(false);
-      setEditingProperty(false);
     }
-  };
-
-  const editProperty = (property) => {
-    setEditingId(property.property_id);
-
-    setForm({
-      title: property.title || '',
-      address: property.address || '',
-      city: property.city || '',
-      price: property.price || '',
-      type: property.type || 'flat',
-      description: property.description || '',
-    });
-
-    setFiles([]);
-    setMessage('');
-    setShowForm(true);
   };
 
   const deleteProperty = async (property) => {
@@ -176,7 +141,6 @@ export default function MyProperties() {
 
   const closeForm = () => {
     setShowForm(false);
-    setEditingId(null);
     setForm({ ...emptyForm });
     setFiles([]);
   };
@@ -235,7 +199,7 @@ export default function MyProperties() {
       {showForm && (
         <form className="property-form" onSubmit={submit}>
           <h2>
-            {editingId ? 'Edit property' : 'Add a property'}
+            Add a property
 
             <span
               onClick={closeForm}
@@ -285,7 +249,7 @@ export default function MyProperties() {
             <label>
               City
 
-              <input
+              <select
                 required
                 value={form.city}
                 onChange={(e) =>
@@ -294,7 +258,14 @@ export default function MyProperties() {
                     city: e.target.value,
                   })
                 }
-              />
+              >
+                <option value="">Select a city</option>
+                {bangladeshCities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <label>
@@ -331,23 +302,21 @@ export default function MyProperties() {
               </select>
             </label>
 
-            {!editingId && (
-              <label>
-                Images (up to 10)
+            <label>
+              Images (up to 10)
 
-                <input
-                  type="file"
-                  required
-                  accept="image/*"
-                  multiple
-                  onChange={(e) =>
-                    setFiles(
-                      [...e.target.files].slice(0, 10)
-                    )
-                  }
-                />
-              </label>
-            )}
+              <input
+                type="file"
+                required
+                accept="image/*"
+                multiple
+                onChange={(e) =>
+                  setFiles(
+                    [...e.target.files].slice(0, 10)
+                  )
+                }
+              />
+            </label>
           </div>
 
           <label>
@@ -367,15 +336,9 @@ export default function MyProperties() {
 
           <button
             className="button"
-            disabled={registeringProperty || editingProperty}
+            disabled={registeringProperty}
           >
-            {editingId
-              ? editingProperty
-                ? 'Saving...'
-                : 'Save changes'
-              : registeringProperty
-                ? 'Registering...'
-                : 'Register property'}
+            {registeringProperty ? 'Registering...' : 'Register property'}
           </button>
         </form>
       )}
@@ -389,7 +352,7 @@ export default function MyProperties() {
           text="Loading your properties"
         />
       ) : properties.length ? (
-        <div className="property-grid my-property-grid">
+        <div className="property-grid my-property-grid" style={{marginTop:"30px"}}>
           {properties.map((p) => (
             <PropertyCard
               key={p.property_id}
@@ -439,13 +402,14 @@ export default function MyProperties() {
                     </button>
                   )}
 
-                  <button
-                    onClick={() => editProperty(p)}
+                  <Link
+                    className="property-card__edit-link"
+                    to={`/app/properties/${p.property_id}/edit`}
                     title={`Edit ${p.title}`}
                   >
                     <HiOutlinePencilSquare />
                     Edit
-                  </button>
+                  </Link>
 
                   <button
                     onClick={() => deleteProperty(p)}

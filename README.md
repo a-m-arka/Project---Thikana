@@ -6,11 +6,15 @@ Thikana (ঠিকানা — Bangla for “address”) is a full-stack real-e
 
 - JWT-based registration, login, profile editing, and protected frontend routes
 - Property management: create, edit, and delete properties; upload up to 10 Cloudinary images
+- Dedicated property editing page with editable details, per-image deletion, and add-image controls capped at 10 images
+- City selection uses a shared list of 20 major Bangladeshi cities in the property form and Explore filters
 - Publish workflow: a property appears publicly only after its owner posts it for rent or sale
-- Home and Explore feeds that display published posts only
+- Explore feed that displays published posts only
+- Property-name search is available above the Explore filters
 - Full property-details pages with description, listing facts, owner details, and every uploaded image
 - Real-time messaging through Socket.IO, with MySQL-backed history and read status
 - Property-card actions for details, messaging an owner, posting, editing, and deleting
+- Responsive app shell with a full-width navbar and centered mobile navigation
 
 ## Tech Stack
 
@@ -108,7 +112,7 @@ The frontend validates the JWT expiry when it starts. Expired or malformed token
 
 1. A user creates a property in **My Properties**. It is private at this stage.
 2. The user clicks **Post**, chooses **Rent** or **Sell**, then confirms.
-3. The property becomes a public post shown to other members on Home and Explore.
+3. The property becomes a public post shown to other members in Explore.
 4. A viewer can select **See details** to view all details and photos, or **Message owner** to start a live conversation.
 
 ## API Overview

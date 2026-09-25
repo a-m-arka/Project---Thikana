@@ -6,7 +6,7 @@ import logo from '../../assets/Thikana_logo_1.png';
 
 export default function Landing() {
   const { token } = useAuth();
-  if (token) return <Navigate to="/app/home" replace />;
+  if (token) return <Navigate to="/app/explore" replace />;
   return (
     <div className="landing">
       <header>

@@ -1,0 +1,32 @@
+@use '../../var.scss' as *;
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  background: $surface-color;
+  color: $muted-text-color;
+  box-shadow: $shadow;
+}
+
+.search-box:focus-within {
+  border-color: $primary-color;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+.search-box input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: $text-color;
+}
+
+.search-box input::placeholder {
+  color: $muted-text-color;
+}

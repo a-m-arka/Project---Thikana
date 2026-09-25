@@ -6,11 +6,11 @@ import Navbar from './components/Navbar/navbar';
 import Landing from './pages/Landing/landing';
 import Login from './pages/Login/login';
 import Signup from './pages/Signup/signup';
-import Home from './pages/Home/home';
 import Explore from './pages/Explore/explore';
 import MyProperties from './pages/MyProperties/myProperties';
 import Profile from './pages/Profile/profile';
 import PropertyDetails from './pages/PropertyDetails/propertyDetails';
+import EditProperty from './pages/EditProperty/editProperty';
 import './App.scss';
 
 function AppLayout() {
@@ -36,15 +36,15 @@ function AppLayout() {
         />
         <main>
           <Routes>
-            <Route path="home" element={<Home onMessageOwner={messageOwner} />} />
             <Route path="explore" element={<Explore onMessageOwner={messageOwner} />} />
             <Route path="my-properties" element={<MyProperties />} />
             <Route
               path="properties/:propertyId"
               element={<PropertyDetails onMessageOwner={messageOwner} />}
             />
+            <Route path="properties/:propertyId/edit" element={<EditProperty />} />
             <Route path="profile" element={<Profile />} />
-            <Route path="*" element={<Navigate to="home" replace />} />
+            <Route path="*" element={<Navigate to="explore" replace />} />
           </Routes>
         </main>
       </div>

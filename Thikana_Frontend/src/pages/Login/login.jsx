@@ -10,14 +10,14 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  if (token) return <Navigate to="/app/home" replace />;
+  if (token) return <Navigate to="/app/explore" replace />;
   const submit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
       await login(form.email, form.password);
-      navigate(location.state?.from?.pathname || '/app/home', { replace: true });
+      navigate(location.state?.from?.pathname || '/app/explore', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {

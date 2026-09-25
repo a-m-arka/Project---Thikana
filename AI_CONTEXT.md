@@ -60,6 +60,8 @@ Directories:
 - `src/utils/`: database, auth, Cloudinary, property, post, and user operations.
 - `src/queries/`: SQL strings and table creation SQL.
 - `src/models/`: `userModel.js`, `propertyModel.js`.
+- `Thikana_Frontend/src/data/cities.js`: shared list of 20 supported Bangladeshi cities used by property forms and Explore filters.
+- `Thikana_Frontend/src/components/SearchBox/`: reusable controlled search input currently used by Explore.
 - `src/socket.js`: JWT-authenticated Socket.IO handlers.
 
 Route-level JWT authentication is centralized in `src/middleware/authMiddleware.js`; it validates the Bearer token and attaches the decoded payload to `req.user`. Existing controllers/services still extract the raw token and call `getUserFromToken`, so both layers currently run during the migration. There is no global error middleware.
@@ -154,7 +156,7 @@ Generic `DELETE /image/delete-image` is authenticated and only deletes a Cloudin
 
 - `POST /post/create-post/:propertyId`: authenticated owner-only JSON `{ postType: 'rent'|'sell' }`; rejects already-posted properties.
 - `DELETE /post/delete-post/:postId`: authenticated post-owner delete.
-- `GET /post/posts`: public published-post feed; Home and Explore use this endpoint.
+- `GET /post/posts`: public published-post feed used by Explore.
 
 ### Messages
 
@@ -171,7 +173,7 @@ register property + images
   -> private property in Properties/Property_Images
   -> owner creates one Posts row with rent or sell
   -> /post/posts exposes it publicly
-  -> Home/Explore display it
+  -> Explore displays it
   -> details page loads /property/properties/:propertyId
 ```
 
@@ -209,10 +211,10 @@ Public:
 
 Protected under `/app/*`:
 
-- `/app/home`: published posts excluding current user
-- `/app/explore`: published posts plus client-side city/type/post-type filtering
+- `/app/explore`: published posts excluding current user, with client-side city/type/post-type filtering; default authenticated page
 - `/app/my-properties`: create, edit, delete, publish properties
 - `/app/properties/:propertyId`: details and gallery
+- `/app/properties/:propertyId/edit`: owner editor for property details and images
 - `/app/profile`: profile editing
 
 `ProtectedRoute` renders protected routes only while `AuthContext` has a valid token. Invalid or expired startup tokens are removed before routing.
@@ -226,9 +228,10 @@ Contexts:
 
 Important components:
 
-- `AppSidebar`: app navigation.
-- `Navbar`: messages toggle and global message target.
+- `AppSidebar`: app navigation below the desktop navbar; becomes a centered, evenly spaced bottom navigation bar on small screens.
+- `Navbar`: full-width top bar with the brand logo, messages toggle, profile control, and logout action.
 - `PropertyCard`: card rendering, details link, owner-message action, owner actions.
+- `EditProperty`: detail-style owner editor; saves details, deletes owned images, and adds images up to the 10-image limit.
 - `MessagePanel`: inbox and conversation thread.
 - `Loader`: loading state.
 
@@ -298,8 +301,6 @@ Backend `npm test` is a placeholder and exits with an error. No automated tests,
 - Property/image workflows are not transactional.
 - `postId` on messages is not fully checked against conversation context.
 - Password-change validation historically uses exactly eight characters despite an “at least 8” message; verify before changing related behavior.
-- Search UI is currently visual only.
-- Explore city filters are hard-coded.
 - Profile-picture/password APIs and property image-management APIs are not fully represented in the frontend UI.
 - Errors on several frontend data-loading paths are intentionally or effectively suppressed.
 - A multi-process deployment needs a shared Socket.IO adapter such as Redis.

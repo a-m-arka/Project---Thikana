@@ -8,11 +8,14 @@
   margin: 0;
   color: $muted-text-color;
 }
+.explore > .search-box {
+  margin-top: 24px;
+}
 .filters {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  margin: 28px 0 18px;
+  margin: 14px 0 18px;
   padding: 14px;
   @include card;
 }

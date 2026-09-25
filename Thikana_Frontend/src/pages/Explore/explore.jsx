@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import PropertyCard from '../../components/PropertyCard/propertyCard';
+import SearchBox from '../../components/SearchBox/searchBox';
 import { useAuth } from '../../context/AuthContext';
+import { bangladeshCities } from '../../data/cities';
 import { toCardProperty } from '../../utils/propertyDisplay';
 
 import './explore.scss';
@@ -16,6 +18,7 @@ export default function Explore({ onMessageOwner }) {
     type: '',
     postType: '',
   });
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [listedProperties, setListedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,11 +49,12 @@ export default function Explore({ onMessageOwner }) {
       listedProperties.filter(
         (p) =>
           Number(p.user_id) !== Number(user?.user_id) &&
+          (!searchTerm || (p.title || '').toLowerCase().includes(searchTerm.trim().toLowerCase())) &&
           (!filters.city || p.city === filters.city) &&
           (!filters.type || p.type === filters.type) &&
           (!filters.postType || p.postType === filters.postType)
       ),
-    [filters, listedProperties, user?.user_id]
+    [filters, listedProperties, searchTerm, user?.user_id]
   );
 
   return (
@@ -61,6 +65,12 @@ export default function Explore({ onMessageOwner }) {
         <p>Browse the latest spaces available to rent or buy.</p>
       </div>
 
+      <SearchBox
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Search by property name"
+      />
+
       <section className="filters">
         <select
           value={filters.city}
@@ -69,9 +79,11 @@ export default function Explore({ onMessageOwner }) {
           }
         >
           <option value="">Any city</option>
-          <option>Dhaka</option>
-          <option>Chattogram</option>
-          <option>Rajshahi</option>
+          {bangladeshCities.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
         </select>
 
         <select
@@ -98,13 +110,14 @@ export default function Explore({ onMessageOwner }) {
         </select>
 
         <button
-          onClick={() =>
+          onClick={() => {
             setFilters({
               city: '',
               type: '',
               postType: '',
-            })
-          }
+            });
+            setSearchTerm('')
+          }}
         >
           Clear filters
         </button>

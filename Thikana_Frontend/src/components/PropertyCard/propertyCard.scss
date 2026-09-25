@@ -114,7 +114,8 @@
   margin-top: 12px;
 }
 
-.property-card__actions button {
+.property-card__actions button,
+.property-card__actions .property-card__edit-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -124,9 +125,11 @@
   background: white;
   color: $primary-dark;
   font-weight: 700;
+  text-decoration: none;
 }
 
-.property-card__actions button:hover {
+.property-card__actions button:hover,
+.property-card__actions .property-card__edit-link:hover {
   background: $primary-light;
 }
 

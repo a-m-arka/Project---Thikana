@@ -1,23 +1,23 @@
 import {
   // HiOutlineBell,
   HiOutlineChatBubbleOvalLeft,
-  HiOutlineMagnifyingGlass,
   HiOutlineArrowRightOnRectangle,
 } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import MessagePanel from '../MessagePanel/messagePanel';
 import './navbar.scss';
+import logo from '../../assets/Thikana_logo_1.png';
+
 export default function Navbar({ messagesOpen, onMessagesOpenChange, messageTarget }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const initials = (user?.name || 'U').slice(0, 1).toUpperCase();
   return (
     <header className="navbar">
-      <label className="navbar__search">
-        <HiOutlineMagnifyingGlass />
-        <input placeholder="Search properties" />
-      </label>
+      <button className="navbar__brand" onClick={() => navigate('/app/explore')}>
+        <img src={logo} alt="Thikana Logo" />
+      </button>
       <div className="navbar__actions">
         {/* <button title="Notifications" className="icon-button">
           <HiOutlineBell />
