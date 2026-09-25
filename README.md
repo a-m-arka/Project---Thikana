@@ -1,5 +1,14 @@
 # Thikana
 
+![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=20232A)
+![Vite 6](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
+![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)
+![Express 4](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
+![Socket.IO 4](https://img.shields.io/badge/Socket.IO-4-010101?logo=socket.io&logoColor=white)
+![Sass](https://img.shields.io/badge/Sass-SCSS-CC6699?logo=sass&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-media-3448C5?logo=cloudinary&logoColor=white)
+
 Thikana (ঠিকানা — Bangla for “address”) is a full-stack real-estate platform for the Bangladeshi market. Members add properties privately, publish them as **Rent** or **Sell** posts, browse other members’ published posts, view full details and photo galleries, and communicate with owners in real time.
 
 ## Features
