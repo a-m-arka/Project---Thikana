@@ -215,7 +215,9 @@ Protected under `/app/*`:
 - `/app/properties/:propertyId`: details and gallery
 - `/app/profile`: profile editing
 
-`ProtectedRoute` currently checks only whether `thikana_token` exists in local storage; it does not validate expiry.
+`ProtectedRoute` renders protected routes only while `AuthContext` has a valid token. Invalid or expired startup tokens are removed before routing.
+
+`AuthContext` now validates the JWT `exp` claim at startup and removes expired or malformed sessions. Authenticated requests use `authenticatedFetch`, which clears the session on HTTP 401; Socket.IO authentication failures do the same. Invalid sessions redirect to `/` through `ProtectedRoute`.
 
 Contexts:
 

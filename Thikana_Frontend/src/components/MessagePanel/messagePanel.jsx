@@ -48,7 +48,7 @@ const messageStatus = (status) => {
 };
 
 export default function MessagePanel({ onClose, initialConversation }) {
-  const { apiUrl, token, user } = useAuth();
+  const { apiUrl, user, authenticatedFetch } = useAuth();
   const socket = useSocket();
 
   const [conversations, setConversations] = useState([]);
@@ -65,10 +65,9 @@ export default function MessagePanel({ onClose, initialConversation }) {
 
   const request = useCallback(
     async (path, options = {}) => {
-      const response = await fetch(`${apiUrl}${path}`, {
+      const response = await authenticatedFetch(`${apiUrl}${path}`, {
         ...options,
         headers: {
-          Authorization: `Bearer ${token}`,
           ...(options.headers || {}),
         },
       });
@@ -81,7 +80,7 @@ export default function MessagePanel({ onClose, initialConversation }) {
 
       return data;
     },
-    [apiUrl, token],
+    [apiUrl, authenticatedFetch],
   );
 
   const loadConversations = useCallback(async () => {

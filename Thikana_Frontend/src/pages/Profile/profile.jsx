@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import './profile.scss';
 export default function Profile() {
-  const { token, apiUrl, user, updateUser } = useAuth();
+  const { apiUrl, user, updateUser, authenticatedFetch } = useAuth();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     name: user?.name || '',
@@ -14,9 +14,7 @@ export default function Profile() {
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/user/get-user-data`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await authenticatedFetch(`${apiUrl}/user/get-user-data`);
         const data = await response.json();
 
         if (data.data) {
@@ -34,14 +32,14 @@ export default function Profile() {
     };
 
     loadUserData();
-  }, [apiUrl, token]);
+  }, [apiUrl, authenticatedFetch]);
   const submit = async (e) => {
     e.preventDefault();
     try {
       setSaving(true);
-      const r = await fetch(`${apiUrl}/user/edit-profile`, {
+      const r = await authenticatedFetch(`${apiUrl}/user/edit-profile`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
       const data = await r.json();

@@ -22,7 +22,7 @@ export const verifyPassword = async (password, hashedPassword) => {
 };
 
 export const generateToken = (user) => {
-    return jwt.sign({ id: user.user_id, email: user.email }, JWT_SECRET, { expiresIn: "1h" });
+    return jwt.sign({ id: user.user_id, email: user.email }, JWT_SECRET, { expiresIn: "2h" });
 };
 
 export const verifyToken = (token) => {

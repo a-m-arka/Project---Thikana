@@ -102,6 +102,8 @@ VITE_SOCKET_URL=http://localhost:4000
 
 When deploying, set `CLIENT_URL` to the frontend origin and configure the two `VITE_*` variables with the deployed backend URL. Use HTTPS/WSS in production.
 
+The frontend validates the JWT expiry when it starts. Expired or malformed tokens are removed from local storage and the user is returned to `/`. Authenticated HTTP 401 responses and Socket.IO authentication failures also clear the session.
+
 ## Main Workflow
 
 1. A user creates a property in **My Properties**. It is private at this stage.

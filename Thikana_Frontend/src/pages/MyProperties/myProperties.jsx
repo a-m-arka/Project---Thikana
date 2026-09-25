@@ -27,7 +27,7 @@ const emptyForm = {
 };
 
 export default function MyProperties() {
-  const { token, apiUrl } = useAuth();
+  const { apiUrl, authenticatedFetch } = useAuth();
 
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,11 +50,7 @@ export default function MyProperties() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${apiUrl}/property/user-properties`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch(`${apiUrl}/property/user-properties`);
 
       const data = await response.json();
 
@@ -66,7 +62,7 @@ export default function MyProperties() {
     } finally {
       setLoading(false);
     }
-  }, [apiUrl, token]);
+  }, [apiUrl, authenticatedFetch]);
 
   useEffect(() => {
     loadProperties();
@@ -81,14 +77,11 @@ export default function MyProperties() {
       if (editingId) {
         setEditingProperty(true);
 
-        response = await fetch(
+        response = await authenticatedFetch(
           `${apiUrl}/property/update-property/${editingId}`,
           {
             method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(form),
           }
         );
@@ -105,13 +98,10 @@ export default function MyProperties() {
           data.append('files', file);
         });
 
-        response = await fetch(
+        response = await authenticatedFetch(
           `${apiUrl}/property/register-property`,
           {
             method: 'POST',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
             body: data,
           }
         );
@@ -163,13 +153,10 @@ export default function MyProperties() {
     }
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${apiUrl}/property/delete-property/${property.property_id}`,
         {
           method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         }
       );
 
@@ -196,14 +183,11 @@ export default function MyProperties() {
 
   const createPost = async (property) => {
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${apiUrl}/post/create-post/${property.property_id}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ postType }),
         }
       );
