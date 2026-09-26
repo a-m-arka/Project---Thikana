@@ -177,9 +177,64 @@
   color: $text-color;
 }
 
-.conversation__copy small {
+.conversation__preview {
   overflow: hidden;
   color: $muted-text-color;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversation__preview--unread {
+  color: $text-color;
+  font-weight: 800;
+}
+
+.message-property-reference {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(82%, 300px);
+  margin: 4px 0 3px;
+  padding: 7px;
+  border: 1px solid $border-color;
+  border-radius: 9px;
+  background: color-mix(in srgb, $surface-color 78%, transparent);
+  color: $text-color;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+}
+
+.message-property-reference--mine {
+  align-self: flex-end;
+}
+
+.message-property-reference:hover {
+  border-color: $primary-color;
+}
+
+.message-property-reference img {
+  flex: 0 0 auto;
+  width: 54px;
+  height: 48px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.message-property-reference > span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.message-property-reference small,
+.message-property-reference > span > span {
+  color: $muted-text-color;
+  font-size: 11px;
+}
+
+.message-property-reference strong {
+  overflow: hidden;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

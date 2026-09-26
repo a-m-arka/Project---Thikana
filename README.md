@@ -18,7 +18,7 @@ Thikana (ঠিকানা — Bangla for “address”) is a full-stack real-e
 - Private property listings that can be published for rent or sale
 - Published-property discovery with search and location/type filters
 - Detailed property pages with listing information, owner details, and image galleries
-- Real-time user messaging with persistent history, read status, and unread indicators
+- Real-time user messaging with persistent history, read status, unread indicators, and property references attached to relevant messages
 - Persistent light and dark themes with a Navbar mode switch
 - Responsive application interface for desktop and mobile users
 

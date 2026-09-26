@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   HiOutlineArrowLeft,
   HiOutlineArrowDown,
@@ -171,8 +172,11 @@ export default function MessagePanel({ onClose, initialConversation }) {
     };
   }, [socket, selected, loadConversations, user?.user_id]);
 
-  const openConversation = async (conversation) => {
-    setSelected(conversation);
+  const openConversation = async (conversation, startWithPropertyContext = false) => {
+    setSelected({
+      ...conversation,
+      post_id: startWithPropertyContext ? conversation.post_id || null : null,
+    });
     setError('');
     setPagination({ hasMore: false, nextCursor: null });
 
@@ -224,7 +228,7 @@ export default function MessagePanel({ onClose, initialConversation }) {
 
   useEffect(() => {
     if (initialConversation) {
-      openConversation(initialConversation);
+      openConversation(initialConversation, true);
     }
   }, [initialConversation]);
 
@@ -247,6 +251,8 @@ export default function MessagePanel({ onClose, initialConversation }) {
       (result) => {
         if (!result?.ok) {
           setError(result?.message || 'Unable to send message');
+        } else {
+          setSelected((current) => ({ ...current, post_id: null }));
         }
       },
     );
@@ -303,7 +309,9 @@ export default function MessagePanel({ onClose, initialConversation }) {
 
               <span className="conversation__copy">
                 <strong>{conversation.other_user_name}</strong>
-                <small>{conversation.message_text}</small>
+                <small className={Number(conversation.unread_count) > 0 ? 'conversation__preview conversation__preview--unread' : 'conversation__preview'}>
+                  {conversation.message_text}
+                </small>
               </span>
 
               <time>{formatTime(conversation.sent_at)}</time>
@@ -344,6 +352,26 @@ export default function MessagePanel({ onClose, initialConversation }) {
                       <div className="message-date-separator">
                         <span>{formatDateSeparator(message.sent_at)}</span>
                       </div>
+                    )}
+
+                    {message.referenced_property_id && (
+                      <Link
+                        className={`message-property-reference ${mine ? 'message-property-reference--mine' : ''}`}
+                        to={`/app/properties/${message.referenced_property_id}`}
+                      >
+                        {message.referenced_property_image && (
+                          <img src={message.referenced_property_image} alt="" />
+                        )}
+                        <span>
+                          <small>Property reference</small>
+                          <strong>{message.referenced_property_title}</strong>
+                          <span>
+                            {[message.referenced_property_city, message.referenced_property_price]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          </span>
+                        </span>
+                      </Link>
                     )}
 
                     <div
