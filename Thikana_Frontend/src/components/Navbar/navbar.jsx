@@ -2,6 +2,8 @@ import {
   // HiOutlineBell,
   HiOutlineChatBubbleOvalLeft,
   HiOutlineArrowRightOnRectangle,
+  HiOutlineMoon,
+  HiOutlineSun,
 } from 'react-icons/hi2';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +13,13 @@ import { useSocket } from '../../context/SocketContext';
 import './navbar.scss';
 import logo from '../../assets/Thikana_logo_1.png';
 
-export default function Navbar({ messagesOpen, onMessagesOpenChange, messageTarget }) {
+export default function Navbar({
+  messagesOpen,
+  onMessagesOpenChange,
+  messageTarget,
+  theme,
+  onToggleTheme,
+}) {
   const { apiUrl, authenticatedFetch, user, logout } = useAuth();
   const socket = useSocket();
   const navigate = useNavigate();
@@ -70,6 +78,16 @@ export default function Navbar({ messagesOpen, onMessagesOpenChange, messageTarg
               {unreadMessages > 99 ? '99+' : unreadMessages}
             </span>
           )}
+        </button>
+        <button
+          type="button"
+          className="icon-button navbar__theme-toggle"
+          onClick={onToggleTheme}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          aria-pressed={theme === 'dark'}
+        >
+          {theme === 'dark' ? <HiOutlineSun /> : <HiOutlineMoon />}
         </button>
         <button className="navbar__user" onClick={() => navigate('/app/profile')}>
           <span>{initials}</span>

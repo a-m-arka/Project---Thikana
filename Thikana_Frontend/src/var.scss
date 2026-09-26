@@ -1,14 +1,15 @@
-$primary-color: #0f766e;
-$primary-dark: #0b5d57;
-$primary-light: #dff5ef;
-$accent-color: #f59e0b;
-$background-color: #f6f8f7;
-$surface-color: #ffffff;
-$text-color: #17211f;
-$muted-text-color: #68736f;
-$border-color: #e3e9e6;
-$danger-color: #dc2626;
-$shadow: 0 12px 28px rgba(21, 42, 36, 0.08);
+$primary-color: var(--primary-color);
+$primary-dark: var(--primary-dark);
+$primary-light: var(--primary-light);
+$accent-color: var(--accent-color);
+$background-color: var(--background-color);
+$surface-color: var(--surface-color);
+$text-color: var(--text-color);
+$muted-text-color: var(--muted-text-color);
+$border-color: var(--border-color);
+$danger-color: var(--danger-color);
+$danger-surface: var(--danger-surface);
+$shadow: var(--card-shadow);
 $sidebar-width: 250px;
 
 @mixin card {

@@ -19,6 +19,7 @@ Thikana (ঠিকানা — Bangla for “address”) is a full-stack real-e
 - Published-property discovery with search and location/type filters
 - Detailed property pages with listing information, owner details, and image galleries
 - Real-time user messaging with persistent history, read status, and unread indicators
+- Persistent light and dark themes with a Navbar mode switch
 - Responsive application interface for desktop and mobile users
 
 ## Tech Stack

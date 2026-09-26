@@ -1,7 +1,7 @@
 @use '../../var.scss' as *;
 .landing {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f6f8f7 60%, #e0f2ed);
+  background: linear-gradient(135deg, $background-color 60%, $primary-light);
 }
 .landing header {
   height: 76px;
@@ -135,7 +135,7 @@
   align-items: center;
   gap: 12px;
   padding: 14px 18px;
-  background: white;
+  background: $surface-color;
   border-radius: 14px;
   box-shadow: $shadow;
 }

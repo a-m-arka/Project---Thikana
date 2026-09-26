@@ -1,5 +1,37 @@
 @use './var.scss' as *;
 
+:root {
+  color-scheme: light;
+  --primary-color: #0f766e;
+  --primary-dark: #0b5d57;
+  --primary-light: #dff5ef;
+  --accent-color: #f59e0b;
+  --background-color: #f6f8f7;
+  --surface-color: #ffffff;
+  --text-color: #17211f;
+  --muted-text-color: #68736f;
+  --border-color: #e3e9e6;
+  --danger-color: #dc2626;
+  --danger-surface: #fff1f1;
+  --card-shadow: 0 12px 28px rgba(21, 42, 36, 0.08);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --primary-color: #0f766e;
+  --primary-dark: #a5eee4;
+  --primary-light: #173d3a;
+  --accent-color: #fbbf24;
+  --background-color: #111a19;
+  --surface-color: #1b2725;
+  --text-color: #edf5f3;
+  --muted-text-color: #a4b5b1;
+  --border-color: #344440;
+  --danger-color: #ff7777;
+  --danger-surface: #462727;
+  --card-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -20,6 +52,12 @@ body {
   min-width: 320px;
   background: $background-color;
   color: $text-color;
+}
+
+input,
+select,
+textarea {
+  color-scheme: inherit;
 }
 
 button,

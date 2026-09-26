@@ -35,7 +35,7 @@
   padding: 11px 12px;
   border: 1px solid $border-color;
   border-radius: 8px;
-  background: #fff;
+  background: $surface-color;
   color: $text-color;
   font: inherit;
   font-weight: 400;
@@ -60,7 +60,7 @@
 }
 
 .edit-property__notice--error {
-  background: #fff1f1;
+  background: $danger-surface;
   color: $danger-color;
 }
 
@@ -117,7 +117,7 @@
   height: 34px;
   border: 0;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
+  background: color-mix(in srgb, $surface-color 92%, transparent);
   color: $danger-color;
   font-size: 19px;
   cursor: pointer;

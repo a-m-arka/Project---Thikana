@@ -4,7 +4,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: linear-gradient(135deg, #e1f2ed, #f6f8f7);
+  background: linear-gradient(135deg, $primary-light, $background-color);
 }
 .auth-card {
   width: min(100%, 440px);

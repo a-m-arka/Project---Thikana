@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import ProtectedRoute from './components/ProtectedRoute/protectedRoute';
 import AppSidebar from './components/AppSidebar/appSidebar';
 import Navbar from './components/Navbar/navbar';
@@ -13,7 +13,7 @@ import PropertyDetails from './pages/PropertyDetails/propertyDetails';
 import EditProperty from './pages/EditProperty/editProperty';
 import './App.scss';
 
-function AppLayout() {
+function AppLayout({ theme, onToggleTheme }) {
   const [messagesOpen, setMessagesOpen] = useState(false);
   const [messageTarget, setMessageTarget] = useState(null);
   const messageOwner = (property) => {
@@ -33,6 +33,8 @@ function AppLayout() {
           messagesOpen={messagesOpen}
           onMessagesOpenChange={setMessagesOpen}
           messageTarget={messageTarget}
+          theme={theme}
+          onToggleTheme={onToggleTheme}
         />
         <main>
           <Routes>
@@ -53,13 +55,29 @@ function AppLayout() {
 }
 
 export default function App() {
+  const [theme, setTheme] = useState(() =>
+    localStorage.getItem('thikana_theme') === 'dark' ? 'dark' : 'light',
+  );
+
+  useLayoutEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('thikana_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((current) => (current === 'dark' ? 'light' : 'dark'));
+  };
+
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route element={<ProtectedRoute />}>
-        <Route path="/app/*" element={<AppLayout />} />
+        <Route
+          path="/app/*"
+          element={<AppLayout theme={theme} onToggleTheme={toggleTheme} />}
+        />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
