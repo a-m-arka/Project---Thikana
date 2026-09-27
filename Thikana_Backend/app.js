@@ -1,8 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { checkConnection } from "./src/config/db.js";
-import createAllTables from "./src/utils/dbUtils.js";
+import prisma from "./src/config/prisma.js";
 import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import imageRoutes from "./src/routes/imageRoutes.js";
@@ -16,7 +15,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 5000;
 const httpServer = createServer(app);
 const clientOrigin = process.env.CLIENT_URL || "http://localhost:5173";
 const io = new Server(httpServer, {
@@ -38,9 +37,9 @@ configureSocketServer(io);
 httpServer.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
   try {
-    await checkConnection();
-    await createAllTables();
+    await prisma.$connect();
+    console.log("Database connected successfully via Prisma ORM");
   } catch (error) {
-    console.error("Failed to initialize database", error);
+    console.error("Failed to connect database via Prisma", error);
   }
 });

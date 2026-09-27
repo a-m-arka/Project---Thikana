@@ -1,73 +1,132 @@
-import * as postUtils from "../utils/postUtils.js";
-import * as userUtils from "../utils/userUtils.js";
-import * as propertyUtils from "../utils/propertyUtils.js";
+import prisma from "../config/prisma.js";
+import { getUserFromToken } from "../utils/authUtils.js";
 
 export const createPost = async (token, propertyId, postType) => {
   try {
-    const user = await userUtils.getUserFromToken(token);
+    const user = await getUserFromToken(token);
     if (!user) {
       return { success: false, message: "Invalid token" };
     }
-    const propertyOwnershipResponse =
-      await propertyUtils.checkUserPropertyOwnership(user.user_id, propertyId);
-    if (!propertyOwnershipResponse.success) {
-      return propertyOwnershipResponse;
-    }
-    if (!propertyOwnershipResponse.ownership) {
+
+    const propId = Number(propertyId);
+
+    // 1. Verify property ownership
+    const property = await prisma.properties.findFirst({
+      where: {
+        property_id: propId,
+        user_id: user.user_id,
+      },
+    });
+
+    if (!property) {
       return { success: false, message: "User doesn't have such property" };
     }
-    const checkPropertyPostedResponse =
-      await postUtils.checkPropertyPosted(propertyId);
-    if (!checkPropertyPostedResponse.success) {
-      return checkPropertyPostedResponse;
-    }
-    if (checkPropertyPostedResponse.posted) {
+
+    // 2. Check if property has already been posted
+    const existingPost = await prisma.posts.findFirst({
+      where: { property_id: propId },
+    });
+
+    if (existingPost) {
       return {
         success: false,
         message: "This property has already been posted",
       };
     }
-    const createPostResponse = await postUtils.createPost(
-      propertyId,
-      user.user_id,
-      postType,
-    );
-    return createPostResponse;
+
+    // 3. Create post with Prisma
+    await prisma.posts.create({
+      data: {
+        property_id: propId,
+        user_id: user.user_id,
+        post_type: postType,
+      },
+    });
+
+    return { success: true, message: "Post created successfully" };
   } catch (error) {
     console.error("Error creating post:", error);
-    return { success: false, message: "Error creating post", error: error };
+    return { success: false, message: "Error creating post", error };
   }
 };
 
 export const deletePost = async (token, postId) => {
   try {
-    const user = await userUtils.getUserFromToken(token);
+    const user = await getUserFromToken(token);
     if (!user) {
       return { success: false, message: "Invalid token" };
     }
-    const checkExistResponse = await postUtils.checkPostExists(postId);
-    if (!checkExistResponse.success) {
-      return checkExistResponse;
-    }
-    if (!checkExistResponse.exists) {
+
+    const pId = Number(postId);
+
+    // 1. Verify post existence
+    const post = await prisma.posts.findUnique({
+      where: { post_id: pId },
+    });
+
+    if (!post) {
       return { success: false, message: "No such post exists" };
     }
-    const getPostUserResponse = await postUtils.getPostUser(postId);
-    if (!getPostUserResponse.success) {
-      return getPostUserResponse;
-    }
-    const postUserId = getPostUserResponse.userId;
-    if (postUserId !== user.user_id) {
+
+    // 2. Verify post belongs to the user
+    if (post.user_id !== user.user_id) {
       return { success: false, message: "User does not have such post" };
     }
-    const deletePostResponse = await postUtils.deletePost(postId);
-    return deletePostResponse;
+
+    // 3. Delete post
+    await prisma.posts.delete({
+      where: { post_id: pId },
+    });
+
+    return { success: true, message: "Post deleted successfully" };
   } catch (error) {
     console.error("Error deleting post:", error);
-    return { success: false, message: "Error deleting post", error: error };
+    return { success: false, message: "Error deleting post", error };
   }
 };
 
 export const getPublishedPosts = async () => {
-  return postUtils.getPublishedPosts();
+  try {
+    const posts = await prisma.posts.findMany({
+      orderBy: [
+        { created_at: "desc" },
+        { post_id: "desc" },
+      ],
+      include: {
+        users: {
+          select: { name: true },
+        },
+        properties: {
+          include: {
+            property_images: true,
+          },
+        },
+      },
+    });
+
+    // Format output to match the shape the frontend components expect
+    const formattedPosts = posts.map((post) => ({
+      post_id: post.post_id,
+      post_type: post.post_type,
+      created_at: post.created_at,
+      property_id: post.property_id,
+      user_id: post.user_id,
+      owner_name: post.users?.name || null,
+      title: post.properties?.title || "",
+      address: post.properties?.address || "",
+      city: post.properties?.city || "",
+      price: post.properties?.price || null,
+      type: post.properties?.type || null,
+      description: post.properties?.description || "",
+      images: (post.properties?.property_images || []).map((img) => ({
+        url: img.image_url,
+        publicId: img.cloudinary_public_id,
+      })),
+    }));
+
+    return { success: true, posts: formattedPosts };
+  } catch (error) {
+    console.error("Error fetching published posts:", error);
+    return { success: false, message: "Error fetching published posts", error };
+  }
 };

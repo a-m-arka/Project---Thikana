@@ -5,11 +5,12 @@
 ![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)
 ![Express 4](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white)
 ![Socket.IO 4](https://img.shields.io/badge/Socket.IO-4-010101?logo=socket.io&logoColor=white)
 ![Sass](https://img.shields.io/badge/Sass-SCSS-CC6699?logo=sass&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-media-3448C5?logo=cloudinary&logoColor=white)
 
-Thikana (ঠিকানা — Bangla for “address”) is a full-stack real-estate platform for the Bangladeshi market. Members add properties privately, publish them as **Rent** or **Sell** posts, browse other members’ published posts, view full details and photo galleries, and communicate with owners in real time.
+Thikana (ঠিকানা — Bangla for "address") is a full-stack real-estate platform for the Bangladeshi market. Members add properties privately, publish them as **Rent** or **Sell** posts, browse other members' published posts, view full details and photo galleries, and communicate with owners in real time.
 
 ## Features
 
@@ -28,7 +29,7 @@ Thikana (ঠিকানা — Bangla for “address”) is a full-stack real-e
 |---|---|
 | Frontend | React 19, React Router v7, Vite, Sass, Socket.IO Client |
 | Backend | Node.js, Express, Socket.IO |
-| Data | MySQL via `mysql2` |
+| Data | MySQL via Prisma ORM (`@prisma/client`, `@prisma/adapter-mariadb`) |
 | Authentication | JWT and `bcryptjs` |
 | Media | Multer and Cloudinary |
 
@@ -38,16 +39,18 @@ Thikana (ঠিকানা — Bangla for “address”) is a full-stack real-e
 Project - Thikana/
 ├── Thikana_Backend/
 │   ├── app.js                 # Express and Socket.IO entry point
+│   ├── prisma.config.ts       # Prisma v7 configuration
+│   ├── prisma/
+│   │   └── schema.prisma      # Prisma schema and relation definitions
 │   └── src/
-│       ├── config/            # Database, Cloudinary, and upload setup
+│       ├── config/            # Prisma client, Cloudinary, and upload setup
 │       ├── controllers/       # HTTP request handlers
 │       ├── middleware/        # Shared JWT authentication middleware
-│       ├── services/          # Business logic
+│       ├── services/          # Business logic and direct Prisma queries
 │       ├── models/            # Data model modules
-│       ├── queries/           # SQL queries and table definitions
 │       ├── routes/            # REST routes
 │       ├── socket.js          # Authenticated Socket.IO events
-│       └── utils/             # Database, auth, Cloudinary helpers
+│       └── utils/             # Auth (JWT/bcrypt/token helper) and Cloudinary
 └── Thikana_Frontend/
     └── src/
         ├── components/        # Cards, navbar, message panel, etc.
@@ -68,10 +71,11 @@ Project - Thikana/
 ```bash
 cd Thikana_Backend
 npm install
+npx prisma generate
 npm start
 ```
 
-The backend creates its MySQL tables when it starts.
+The backend connects to MySQL through Prisma ORM on startup.
 
 ### Frontend
 
@@ -91,10 +95,7 @@ Create `Thikana_Backend/.env`:
 PORT=4000
 CLIENT_URL=http://localhost:5173
 
-DB_HOST=localhost
-DB_USER=your_mysql_user
-DB_PASSWORD=your_mysql_password
-DB_NAME=thikana
+DATABASE_URL="mysql://your_mysql_user:your_mysql_password@localhost:3306/thikana"
 
 JWT_SECRET=replace_with_a_long_random_secret
 
@@ -134,7 +135,7 @@ All routes are prefixed with `/api`. Routes marked as authenticated require `Aut
 | PUT | `/user/update-profile-picture` | Upload profile picture | Yes |
 | PUT | `/user/change-password` | Change password | Yes |
 | POST | `/property/register-property` | Add a property and images | Yes |
-| GET | `/property/user-properties` | Current user’s properties and post status | Yes |
+| GET | `/property/user-properties` | Current user's properties and post status | Yes |
 | PUT | `/property/update-property/:propertyId` | Edit a property | Yes |
 | DELETE | `/property/delete-property/:propertyId` | Delete a property | Yes |
 | POST | `/property/add-new-images/:propertyId` | Add property images | Yes |
@@ -165,11 +166,13 @@ The frontend connects with the JWT in `auth.token`. The server verifies it and a
 
 ## Database Tables
 
-- `Users`
-- `Properties`
-- `Posts`
-- `Property_Images`
-- `Messages`
+- `users`
+- `properties`
+- `posts`
+- `property_images`
+- `messages`
+
+Schema is defined in `Thikana_Backend/prisma/schema.prisma` and managed by Prisma ORM.
 
 ## Verification
 

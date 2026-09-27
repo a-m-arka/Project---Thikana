@@ -1,5 +1,5 @@
+import prisma from "../config/prisma.js";
 import * as imageUtils from "../utils/cloudinaryUtils.js";
-import * as propertyUtils from "../utils/propertyUtils.js";
 
 export const uploadImage = async (fileBuffer, fileName) => {
     try {
@@ -21,25 +21,34 @@ export const uploadMultipleImages = async (files) => {
 
 export const deleteImage = async (public_id, userId) => {
     try {
-        const ownership = await propertyUtils.getOwnedPropertyImage(public_id, userId);
-        if (!ownership.success) {
-            throw new Error(ownership.message);
-        }
-        if (!ownership.image) {
+        // 1. Verify image exists and belongs to a property owned by this user
+        const image = await prisma.property_images.findFirst({
+            where: {
+                cloudinary_public_id: public_id,
+                properties: {
+                    user_id: Number(userId),
+                },
+            },
+        });
+
+        if (!image) {
             const error = new Error("You do not own this image");
             error.statusCode = 403;
             throw error;
         }
 
+        // 2. Delete image from Cloudinary
         const cloudinaryResult = await imageUtils.deleteImage(public_id);
         if (!cloudinaryResult.success) {
             throw new Error("Error deleting image from Cloudinary");
         }
 
-        const databaseResult = await propertyUtils.deletePropertyImage(public_id);
-        if (!databaseResult.success) {
-            throw new Error(databaseResult.message);
-        }
+        // 3. Delete image from database
+        await prisma.property_images.deleteMany({
+            where: {
+                cloudinary_public_id: public_id,
+            },
+        });
 
         return { success: true, result: cloudinaryResult.result };
     } catch (error) {
