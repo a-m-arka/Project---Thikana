@@ -130,3 +130,90 @@ export const getPublishedPosts = async () => {
     return { success: false, message: "Error fetching published posts", error };
   }
 };
+
+export const getUserPosts = async (token) => {
+  try {
+    const user = await getUserFromToken(token);
+    if (!user) {
+      return { success: false, message: "Invalid token" };
+    }
+
+    const posts = await prisma.posts.findMany({
+      where: { user_id: user.user_id },
+      orderBy: [
+        { created_at: "desc" },
+        { post_id: "desc" },
+      ],
+      include: {
+        users: {
+          select: { name: true },
+        },
+        properties: {
+          include: {
+            property_images: true,
+          },
+        },
+      },
+    });
+
+    const formattedPosts = posts.map((post) => ({
+      post_id: post.post_id,
+      post_type: post.post_type,
+      created_at: post.created_at,
+      property_id: post.property_id,
+      user_id: post.user_id,
+      owner_name: post.users?.name || null,
+      title: post.properties?.title || "",
+      address: post.properties?.address || "",
+      city: post.properties?.city || "",
+      price: post.properties?.price || null,
+      type: post.properties?.type || null,
+      description: post.properties?.description || "",
+      images: (post.properties?.property_images || []).map((img) => ({
+        url: img.image_url,
+        publicId: img.cloudinary_public_id,
+      })),
+    }));
+
+    return { success: true, posts: formattedPosts };
+  } catch (error) {
+    console.error("Error fetching user posts:", error);
+    return { success: false, message: "Error fetching user posts", error };
+  }
+};
+
+export const updatePostType = async (token, postId, postType) => {
+  try {
+    const user = await getUserFromToken(token);
+    if (!user) {
+      return { success: false, message: "Invalid token" };
+    }
+
+    const pId = Number(postId);
+    if (!["sell", "rent"].includes(postType)) {
+      return { success: false, message: "Invalid post type. Must be 'sell' or 'rent'" };
+    }
+
+    const post = await prisma.posts.findUnique({
+      where: { post_id: pId },
+    });
+
+    if (!post) {
+      return { success: false, message: "No such post exists" };
+    }
+
+    if (post.user_id !== user.user_id) {
+      return { success: false, message: "User does not have such post" };
+    }
+
+    await prisma.posts.update({
+      where: { post_id: pId },
+      data: { post_type: postType },
+    });
+
+    return { success: true, message: "Post type updated successfully" };
+  } catch (error) {
+    console.error("Error updating post type:", error);
+    return { success: false, message: "Error updating post type", error };
+  }
+};

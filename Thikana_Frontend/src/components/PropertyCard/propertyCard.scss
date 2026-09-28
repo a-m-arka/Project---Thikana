@@ -161,3 +161,31 @@
   font-weight: 700;
   text-transform: capitalize;
 }
+
+.property-card__post-type-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: $primary-light;
+  color: $primary-dark;
+  font-size: 13px;
+  font-weight: 700;
+
+  select {
+    padding: 3px 6px;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    background: $surface-color;
+    color: $primary-dark;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}

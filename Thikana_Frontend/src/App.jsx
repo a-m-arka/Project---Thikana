@@ -11,6 +11,7 @@ import MyProperties from './pages/MyProperties/myProperties';
 import Profile from './pages/Profile/profile';
 import PropertyDetails from './pages/PropertyDetails/propertyDetails';
 import EditProperty from './pages/EditProperty/editProperty';
+import MyPosts from './pages/MyPosts/myPosts';
 import './App.scss';
 
 function AppLayout({ theme, onToggleTheme }) {
@@ -40,6 +41,7 @@ function AppLayout({ theme, onToggleTheme }) {
           <Routes>
             <Route path="explore" element={<Explore onMessageOwner={messageOwner} />} />
             <Route path="my-properties" element={<MyProperties />} />
+            <Route path="my-posts" element={<MyPosts />} />
             <Route
               path="properties/:propertyId"
               element={<PropertyDetails onMessageOwner={messageOwner} />}
@@ -70,7 +72,7 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Landing theme={theme} onToggleTheme={toggleTheme} />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route element={<ProtectedRoute />}>

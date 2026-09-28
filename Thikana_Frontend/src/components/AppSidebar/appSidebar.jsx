@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   HiOutlineBuildingOffice2,
+  HiOutlineDocumentText,
   HiOutlineMap,
   HiOutlineUserCircle,
 } from 'react-icons/hi2';
@@ -9,6 +10,7 @@ import './appSidebar.scss';
 const links = [
   { to: '/app/explore', label: 'Explore', icon: HiOutlineMap },
   { to: '/app/my-properties', label: 'My Properties', icon: HiOutlineBuildingOffice2 },
+  { to: '/app/my-posts', label: 'My Posts', icon: HiOutlineDocumentText },
   { to: '/app/profile', label: 'Profile', icon: HiOutlineUserCircle },
 ];
 export default function AppSidebar() {
