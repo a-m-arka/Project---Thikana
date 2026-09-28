@@ -45,7 +45,7 @@ export default function Landing({ theme, onToggleTheme, }) {
               Your next <em>Thikana</em> starts here.
             </h1>
             <p className="landing__lead">
-              Discover places to rent, buy, or list—within a community of verified members.
+              Discover places to rent, buy, or list
             </p>
             <div className="landing__cta">
               <Link className="button" to="/signup">
@@ -57,10 +57,10 @@ export default function Landing({ theme, onToggleTheme, }) {
             </div>
             <div className="landing__trust">
               <span>
-                <HiCheckCircle /> Verified members
+                <HiCheckCircle /> Rent & Sell Listings
               </span>
               <span>
-                <HiCheckCircle /> Clear property details
+                <HiCheckCircle /> Contact The Owner Directly
               </span>
             </div>
           </div>
