@@ -16,6 +16,7 @@
 }
 .landing header > div {
   display: flex;
+  justify-content: space-evenly;
   align-items: center;
   gap: 20px;
   font-weight: 700;
@@ -85,6 +86,7 @@
   justify-content: center;
   gap: 8px;
   padding: 14px 20px;
+  padding-top: 12px;
   border: 0;
   border-radius: 10px;
   background: $primary-color;
@@ -96,6 +98,7 @@
 }
 .button--small {
   padding: 10px 15px;
+  padding-top: 8px;
 }
 .text-link {
   color: $primary-dark;
