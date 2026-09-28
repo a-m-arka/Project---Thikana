@@ -17,6 +17,7 @@ Thikana (ঠিকানা — Bangla for "address") is a full-stack real-estat
 - Secure user authentication with profile management and protected application routes
 - Property creation and management with Cloudinary image storage
 - Private property listings that can be published for rent or sale
+- My Posts management dashboard to view published posts, switch listing type (rent/sell), or unpost listings
 - Published-property discovery with search and location/type filters
 - Detailed property pages with listing information, owner details, and image galleries
 - Real-time user messaging with persistent history, read status, unread indicators, and property references attached to relevant messages
@@ -55,7 +56,7 @@ Project - Thikana/
     └── src/
         ├── components/        # Cards, navbar, message panel, etc.
         ├── context/           # Auth and Socket providers
-        └── pages/             # App pages, including PropertyDetails
+        └── pages/             # App pages, including PropertyDetails, MyProperties, MyPosts
 ```
 
 ## Getting Started
@@ -119,8 +120,9 @@ The frontend validates the JWT expiry when it starts. Expired or malformed token
 
 1. A user creates a property in **My Properties**. It is private at this stage.
 2. The user clicks **Post**, chooses **Rent** or **Sell**, then confirms.
-3. The property becomes a public post shown to other members in Explore.
-4. A viewer can select **See details** to view all details and photos, or **Message owner** to start a live conversation.
+3. The property becomes a public post shown to other members in Explore and listed in **My Posts**.
+4. In **My Posts**, the owner can switch the post type between rent/sell or unpost (delete post) without deleting the property.
+5. A viewer can select **See details** to view all details and photos, or **Message owner** to start a live conversation.
 
 ## API Overview
 
@@ -140,12 +142,15 @@ All routes are prefixed with `/api`. Routes marked as authenticated require `Aut
 | DELETE | `/property/delete-property/:propertyId` | Delete a property | Yes |
 | POST | `/property/add-new-images/:propertyId` | Add property images | Yes |
 | DELETE | `/property/delete-images/:propertyId` | Delete property images | Yes |
+| GET | `/property/properties` | Public all-property query | No |
+| GET | `/property/properties/:propertyId` | Complete property details and gallery | No |
 | POST | `/image/upload-image` | Upload a generic image | Yes |
 | POST | `/image/upload-multiple-images` | Upload multiple generic images | Yes |
 | DELETE | `/image/delete-image` | Delete an owned property image by Cloudinary public ID | Yes |
-| GET | `/property/properties/:propertyId` | Complete property details and gallery | No |
 | POST | `/post/create-post/:propertyId` | Publish as `rent` or `sell` | Yes |
 | GET | `/post/posts` | Published-post feed | No |
+| GET | `/post/user-posts` | Current user's published posts | Yes |
+| PATCH | `/post/update-post/:postId` | Update post type (`rent` or `sell`) | Yes |
 | DELETE | `/post/delete-post/:postId` | Remove a post | Yes |
 | GET | `/messages/conversations` | Conversation summaries | Yes |
 | GET | `/messages/conversations/:otherUserId` | Conversation history | Yes |
@@ -185,7 +190,6 @@ npm run build
 
 ## Roadmap
 
-- Add post unpublishing and post editing
 - Add search and more complete Explore filters
 - Add automated tests and OpenAPI documentation
 - Add a shared Socket.IO adapter such as Redis when scaling the backend beyond one process
