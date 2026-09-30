@@ -96,6 +96,7 @@ export default function Explore({ onMessageOwner }) {
           <option>Flat</option>
           <option>House</option>
           <option>Commercial</option>
+          <option>Plot</option>
         </select>
 
         <select

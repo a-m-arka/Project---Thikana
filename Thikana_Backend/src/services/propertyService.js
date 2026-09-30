@@ -25,6 +25,28 @@ export const registerProperty = async (token, property, files) => {
         price: property.price,
         type: property.type,
         description: property.description,
+        area:
+          property.area !== undefined &&
+          property.area !== null &&
+          property.area !== ""
+            ? Number(property.area)
+            : null,
+        total_floors:
+          property.type === "plot"
+            ? 0
+            : property.totalFloors !== undefined &&
+                property.totalFloors !== null &&
+                property.totalFloors !== ""
+              ? Number(property.totalFloors)
+              : 0,
+        total_rooms:
+          property.type === "plot"
+            ? 0
+            : property.totalRooms !== undefined &&
+                property.totalRooms !== null &&
+                property.totalRooms !== ""
+              ? Number(property.totalRooms)
+              : 0,
         property_images: {
           create: uploadImageResponse.results.map((image) => ({
             image_url: image.url,
@@ -115,6 +137,23 @@ export const updatePropertyDetails = async (token, propertyId, newData) => {
       return { success: false, message: "User doesn't have such property" };
     }
 
+    const effectiveType =
+      newData.type !== undefined ? newData.type : property.type;
+
+    if (effectiveType === "plot") {
+      if (
+        (newData.totalFloors !== undefined &&
+          Number(newData.totalFloors) !== 0) ||
+        (newData.totalRooms !== undefined &&
+          Number(newData.totalRooms) !== 0)
+      ) {
+        return {
+          success: false,
+          message: "For plot properties, total floors and total rooms must be 0",
+        };
+      }
+    }
+
     // Build update object only with defined fields
     const updateData = {};
     if (newData.title !== undefined) updateData.title = newData.title;
@@ -124,6 +163,30 @@ export const updatePropertyDetails = async (token, propertyId, newData) => {
     if (newData.type !== undefined) updateData.type = newData.type;
     if (newData.description !== undefined)
       updateData.description = newData.description;
+    if (newData.area !== undefined) {
+      updateData.area =
+        newData.area !== null && newData.area !== ""
+          ? Number(newData.area)
+          : null;
+    }
+
+    if (effectiveType === "plot") {
+      updateData.total_floors = 0;
+      updateData.total_rooms = 0;
+    } else {
+      if (newData.totalFloors !== undefined) {
+        updateData.total_floors =
+          newData.totalFloors !== null && newData.totalFloors !== ""
+            ? Number(newData.totalFloors)
+            : 0;
+      }
+      if (newData.totalRooms !== undefined) {
+        updateData.total_rooms =
+          newData.totalRooms !== null && newData.totalRooms !== ""
+            ? Number(newData.totalRooms)
+            : 0;
+      }
+    }
 
     await prisma.properties.update({
       where: { property_id: propId },
@@ -158,25 +221,13 @@ export const addNewPropertyImages = async (token, propertyId, files) => {
       return { success: false, message: "User doesn't have such property" };
     }
 
-    // Count existing images
-    const currentImageCount = await prisma.property_images.count({
-      where: { property_id: propId },
-    });
-
-    if (files.length + currentImageCount > 10) {
-      return {
-        success: false,
-        message: "At most 10 images per property allowed",
-      };
-    }
-
     const uploadImageResponse =
       await cloudinaryUtils.uploadMultipleImages(files);
     if (!uploadImageResponse.success) {
       return uploadImageResponse;
     }
 
-    // Batch insert new images into DB
+    // Insert new images
     await prisma.property_images.createMany({
       data: uploadImageResponse.results.map((image) => ({
         property_id: propId,
@@ -287,6 +338,9 @@ export const getUserProperties = async (token) => {
         price: p.price,
         type: p.type,
         description: p.description,
+        area: p.area ? Number(p.area) : null,
+        total_floors: p.total_floors ?? 0,
+        total_rooms: p.total_rooms ?? 0,
         post_id: latestPost?.post_id || null,
         post_type: latestPost?.post_type || null,
         images: p.property_images.map((img) => ({
@@ -327,6 +381,9 @@ export const getAllProperties = async () => {
       price: p.price,
       type: p.type,
       description: p.description,
+      area: p.area ? Number(p.area) : null,
+      total_floors: p.total_floors ?? 0,
+      total_rooms: p.total_rooms ?? 0,
       images: p.property_images.map((img) => ({
         url: img.image_url,
         publicId: img.cloudinary_public_id,
@@ -370,6 +427,9 @@ export const getPropertyById = async (propertyId) => {
       price: p.price,
       type: p.type,
       description: p.description,
+      area: p.area ? Number(p.area) : null,
+      total_floors: p.total_floors ?? 0,
+      total_rooms: p.total_rooms ?? 0,
       post_id: latestPost?.post_id || null,
       post_type: latestPost?.post_type || null,
       images: p.property_images.map((img) => ({

@@ -25,6 +25,9 @@ const emptyForm = {
   city: '',
   price: '',
   type: 'flat',
+  area: '',
+  total_floors: '',
+  total_rooms: '',
   description: '',
 };
 
@@ -289,17 +292,75 @@ export default function MyProperties() {
 
               <select
                 value={form.type}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    type: e.target.value,
-                  })
-                }
+                onChange={(e) => {
+                  const selectedType = e.target.value;
+                  setForm((prev) => ({
+                    ...prev,
+                    type: selectedType,
+                    total_floors: selectedType === 'plot' ? 0 : (prev.total_floors === 0 ? '' : prev.total_floors),
+                    total_rooms: selectedType === 'plot' ? 0 : (prev.total_rooms === 0 ? '' : prev.total_rooms),
+                  }));
+                }}
               >
                 <option value="flat">Flat</option>
                 <option value="house">House</option>
                 <option value="commercial">Commercial</option>
+                <option value="plot">Plot</option>
               </select>
+            </label>
+
+            <label>
+              Area (sq ft)
+
+              <input
+                type="number"
+                min="0"
+                step="any"
+                placeholder="e.g. 1200"
+                value={form.area}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    area: e.target.value,
+                  })
+                }
+              />
+            </label>
+
+            <label>
+              Total floors
+
+              <input
+                type="number"
+                min="0"
+                disabled={form.type === 'plot'}
+                placeholder={form.type === 'plot' ? '0 (N/A for plot)' : 'e.g. 4'}
+                value={form.type === 'plot' ? 0 : form.total_floors}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    total_floors: e.target.value,
+                  })
+                }
+              />
+            </label>
+
+            <label>
+              Total rooms
+
+              <input
+                type="number"
+                min="0"
+                disabled={form.type === 'plot'}
+                placeholder={form.type === 'plot' ? '0 (N/A for plot)' : 'e.g. 3'}
+                value={form.type === 'plot' ? 0 : form.total_rooms}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    total_rooms: e.target.value,
+                  })
+                }
+              />
             </label>
 
             <label>
@@ -362,52 +423,49 @@ export default function MyProperties() {
                   <span className="property-card__posted">
                     Posted for {p.post_type}
                   </span>
-                ) : null
+                ) : postingPropertyId === p.property_id ? (
+                  <div className="property-card__post-controls">
+                    <select
+                      value={postType}
+                      onChange={(event) =>
+                        setPostType(event.target.value)
+                      }
+                    >
+                      <option value="rent">Rent</option>
+                      <option value="sell">Sell</option>
+                    </select>
+
+                    <button
+                      onClick={() => createPost(p)}
+                    >
+                      Confirm post
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        setPostingPropertyId(null)
+                      }
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="property-card__post-button"
+                    onClick={() => {
+                      setPostType('rent');
+                      setPostingPropertyId(p.property_id);
+                    }}
+                    title={`Post ${p.title}`}
+                  >
+                    <HiOutlineArrowUpOnSquare />
+                    Post
+                  </button>
+                )
               }
-              detailsInActions={Boolean(p.post_id)}
+              detailsInActions={true}
               actions={
                 <>
-                  {p.post_id ? (
-                    null
-                  ) : postingPropertyId === p.property_id ? (
-                    <div className="property-card__post-controls">
-                      <select
-                        value={postType}
-                        onChange={(event) =>
-                          setPostType(event.target.value)
-                        }
-                      >
-                        <option value="rent">Rent</option>
-                        <option value="sell">Sell</option>
-                      </select>
-
-                      <button
-                        onClick={() => createPost(p)}
-                      >
-                        Confirm post
-                      </button>
-
-                      <button
-                        onClick={() =>
-                          setPostingPropertyId(null)
-                        }
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setPostType('rent');
-                        setPostingPropertyId(p.property_id);
-                      }}
-                      title={`Post ${p.title}`}
-                    >
-                      <HiOutlineArrowUpOnSquare />
-                      Post
-                    </button>
-                  )}
-
                   <Link
                     className="property-card__edit-link"
                     to={`/app/properties/${p.property_id}/edit`}

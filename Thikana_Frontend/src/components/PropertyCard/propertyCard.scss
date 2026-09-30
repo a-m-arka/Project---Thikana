@@ -64,6 +64,24 @@
   font-size: 13px;
 }
 
+.property-card__specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -4px 0 10px;
+  font-size: 12px;
+  color: $muted-text-color;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    background: $background-color;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+}
+
 .property-card__price {
   margin: 0;
   color: $text-color;
@@ -137,17 +155,55 @@
   color: $danger-color;
 }
 
+.property-card__post-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid $primary-color;
+  border-radius: 8px;
+  background: transparent;
+  color: $primary-dark;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: $primary-light;
+  }
+}
+
 .property-card__post-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
-}
 
-.property-card__post-controls select {
-  padding: 8px;
-  border: 1px solid $border-color;
-  border-radius: 8px;
-  color: $text-color;
+  select {
+    padding: 8px;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    color: $text-color;
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    background: $surface-color;
+    color: $primary-dark;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover {
+      background: $primary-light;
+    }
+
+    &:last-child {
+      color: $muted-text-color;
+    }
+  }
 }
 
 .property-card__posted {

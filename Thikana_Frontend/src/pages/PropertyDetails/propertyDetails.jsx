@@ -82,6 +82,24 @@ export default function PropertyDetails({ onMessageOwner }) {
             <dt>Location</dt>
             <dd>{property.city}</dd>
           </div>
+          {property.area && (
+            <div>
+              <dt>Area</dt>
+              <dd>{property.area} sq ft</dd>
+            </div>
+          )}
+          {property.type !== "Plot" && (
+            <>
+              <div>
+                <dt>Total rooms</dt>
+                <dd>{property.total_rooms ?? 0}</dd>
+              </div>
+              <div>
+                <dt>Total floors</dt>
+                <dd>{property.total_floors ?? 0}</dd>
+              </div>
+            </>
+          )}
           <div>
             <dt>Listed by</dt>
             <dd>{property.owner_name || 'Property owner'}</dd>

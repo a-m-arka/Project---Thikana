@@ -15,7 +15,7 @@ Thikana (ঠিকানা — Bangla for "address") is a full-stack real-estat
 ## Features
 
 - Secure user authentication with profile management and protected application routes
-- Property creation and management with Cloudinary image storage
+- Property creation and management (flats, houses, commercial spaces, and plots with area and room/floor specifications) with Cloudinary image storage
 - Private property listings that can be published for rent or sale
 - My Posts management dashboard to view published posts, switch listing type (rent/sell), or unpost listings
 - Published-property discovery with search and location/type filters
@@ -172,7 +172,7 @@ The frontend connects with the JWT in `auth.token`. The server verifies it and a
 ## Database Tables
 
 - `users`
-- `properties`
+- `properties` (supports types `flat`, `house`, `commercial`, `plot`, with `area`, `total_floors`, and `total_rooms`)
 - `posts`
 - `property_images`
 - `messages`

@@ -6,13 +6,46 @@ export const registerProperty = async (req, res) => {
   if (!token) {
     return res.status(401).json({ message: "Token not found" });
   }
-  const { title, address, city, price, type, description } = req.body;
+  const {
+    title,
+    address,
+    city,
+    price,
+    type,
+    description,
+    area,
+    total_floors,
+    totalFloors,
+    total_rooms,
+    totalRooms,
+  } = req.body;
+
   if (!title || !address || !city || !price || !type || !description) {
     return res.status(400).json({ message: "Missing required information" });
   }
-  if (type !== "flat" && type !== "house" && type !== "commercial") {
+  if (
+    type !== "flat" &&
+    type !== "house" &&
+    type !== "commercial" &&
+    type !== "plot"
+  ) {
     return res.status(400).json({ message: "Invalid property type" });
   }
+
+  const rawFloors = total_floors ?? totalFloors;
+  const rawRooms = total_rooms ?? totalRooms;
+
+  if (type === "plot") {
+    if (
+      (rawFloors !== undefined && Number(rawFloors) !== 0) ||
+      (rawRooms !== undefined && Number(rawRooms) !== 0)
+    ) {
+      return res.status(400).json({
+        message: "For plot properties, total floors and total rooms must be 0",
+      });
+    }
+  }
+
   const files = req.files;
   if (!files || !files.length) {
     return res.status(400).json({ message: "At least one image is required" });
@@ -20,6 +53,7 @@ export const registerProperty = async (req, res) => {
   if (files.length > 10) {
     return res.status(400).json({ message: "Maximum 10 images are allowed" });
   }
+
   const property = new PropertyModel({
     title,
     address,
@@ -27,7 +61,11 @@ export const registerProperty = async (req, res) => {
     price,
     type,
     description,
+    area: area !== undefined && area !== "" ? Number(area) : null,
+    totalFloors: type === "plot" ? 0 : (rawFloors !== undefined && rawFloors !== "" ? Number(rawFloors) : 0),
+    totalRooms: type === "plot" ? 0 : (rawRooms !== undefined && rawRooms !== "" ? Number(rawRooms) : 0),
   });
+
   try {
     const response = await propertyService.registerProperty(
       token,
@@ -79,15 +117,45 @@ export const updatePropertyDetails = async (req, res) => {
   if (!propertyId) {
     return res.status(400).json({ message: "Property ID is required" });
   }
-  const { title, address, city, price, type, description } = req.body;
+  const {
+    title,
+    address,
+    city,
+    price,
+    type,
+    description,
+    area,
+    total_floors,
+    totalFloors,
+    total_rooms,
+    totalRooms,
+  } = req.body;
+
   if (
+    type !== undefined &&
     type !== null &&
     type !== "flat" &&
     type !== "house" &&
-    type !== "commercial"
+    type !== "commercial" &&
+    type !== "plot"
   ) {
     return res.status(400).json({ message: "Invalid property type" });
   }
+
+  const rawFloors = total_floors ?? totalFloors;
+  const rawRooms = total_rooms ?? totalRooms;
+
+  if (type === "plot") {
+    if (
+      (rawFloors !== undefined && Number(rawFloors) !== 0) ||
+      (rawRooms !== undefined && Number(rawRooms) !== 0)
+    ) {
+      return res.status(400).json({
+        message: "For plot properties, total floors and total rooms must be 0",
+      });
+    }
+  }
+
   const newProperty = new PropertyModel({
     title,
     address,
@@ -95,7 +163,11 @@ export const updatePropertyDetails = async (req, res) => {
     price,
     type,
     description,
+    area: area !== undefined && area !== "" ? (area === null ? null : Number(area)) : undefined,
+    totalFloors: rawFloors !== undefined && rawFloors !== "" ? Number(rawFloors) : undefined,
+    totalRooms: rawRooms !== undefined && rawRooms !== "" ? Number(rawRooms) : undefined,
   });
+
   try {
     const response = await propertyService.updatePropertyDetails(
       token,
@@ -195,7 +267,7 @@ export const getUserProperties = async (req, res) => {
   }
 };
 
-export const getAllProperties = async (req, res) => {
+export const getAllProperties = async () => {
   try {
     const response = await propertyService.getAllProperties();
     if (response.success) {

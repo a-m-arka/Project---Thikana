@@ -20,6 +20,17 @@ export default function PropertyCard({
         <p className="property-card__location">
           <HiOutlineMapPin /> {property.address}, {property.city}
         </p>
+        {(property.area || (property.type !== "Plot" && (property.total_rooms > 0 || property.total_floors > 0))) && (
+          <div className="property-card__specs">
+            {property.area && <span>{property.area} sq ft</span>}
+            {property.type !== "Plot" && property.total_rooms > 0 && (
+              <span>{property.total_rooms} {property.total_rooms === 1 ? "room" : "rooms"}</span>
+            )}
+            {property.type !== "Plot" && property.total_floors > 0 && (
+              <span>{property.total_floors} {property.total_floors === 1 ? "floor" : "floors"}</span>
+            )}
+          </div>
+        )}
         <p className="property-card__price">
           ৳ {property.price}
           <small>{property.postType === 'Rent' ? ' / month' : ''}</small>

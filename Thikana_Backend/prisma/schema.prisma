@@ -51,6 +51,9 @@ model properties {
   price           Decimal?          @db.Decimal(15, 2)
   type            properties_type
   description     String?           @db.Text
+  area            Decimal?          @db.Decimal(10, 2)
+  total_floors    Int?              @default(0)
+  total_rooms     Int?              @default(0)
   posts           posts[]
   users           users?            @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "properties_ibfk_1")
   property_images property_images[]
@@ -69,18 +72,18 @@ model property_images {
 }
 
 model users {
-  user_id                              Int          @id @default(autoincrement())
-  name                                 String       @db.VarChar(255)
-  email                                String       @unique(map: "email") @db.VarChar(255)
-  phone_number                         String?      @db.VarChar(20)
-  password                             String       @db.VarChar(255)
-  address                              String?      @db.Text
-  profile_picture_url                  String?      @db.VarChar(512)
-  profile_picture_cloudinary_id        String?      @db.VarChar(255)
+  user_id                           Int                    @id @default(autoincrement())
+  name                              String                 @db.VarChar(255)
+  email                             String                 @unique(map: "email") @db.VarChar(255)
+  phone_number                      String?                @db.VarChar(20)
+  password                          String                 @db.VarChar(255)
+  address                           String?                @db.Text
+  profile_picture_url               String?                @db.VarChar(512)
+  profile_picture_cloudinary_id     String?                @db.VarChar(255)
   sent_messages                     messages[]             @relation("messages_sender_idTousers")
   received_messages                 messages[]             @relation("messages_receiver_idTousers")
-  posts                                posts[]
-  properties                           properties[]
+  posts                             posts[]
+  properties                        properties[]
 }
 
 enum posts_post_type {
@@ -98,6 +101,7 @@ enum properties_type {
   flat
   house
   commercial
+  plot
 }
 
 enum messages_message_type {

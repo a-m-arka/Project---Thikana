@@ -16,6 +16,9 @@ const emptyForm = {
   city: '',
   price: '',
   type: 'flat',
+  area: '',
+  total_floors: '',
+  total_rooms: '',
   description: '',
 };
 
@@ -60,6 +63,9 @@ export default function EditProperty() {
       city: property.city || '',
       price: property.price || '',
       type: property.type || 'flat',
+      area: property.area ?? '',
+      total_floors: property.type === 'plot' ? 0 : (property.total_floors ?? ''),
+      total_rooms: property.type === 'plot' ? 0 : (property.total_rooms ?? ''),
       description: property.description || '',
     });
     setImages(parseImages(property.images));
@@ -205,11 +211,56 @@ export default function EditProperty() {
             </label>
             <label>
               Property type
-              <select value={form.type} onChange={(event) => updateField('type', event.target.value)}>
+              <select
+                value={form.type}
+                onChange={(event) => {
+                  const selectedType = event.target.value;
+                  setForm((current) => ({
+                    ...current,
+                    type: selectedType,
+                    total_floors: selectedType === 'plot' ? 0 : (current.total_floors === 0 ? '' : current.total_floors),
+                    total_rooms: selectedType === 'plot' ? 0 : (current.total_rooms === 0 ? '' : current.total_rooms),
+                  }));
+                }}
+              >
                 <option value="flat">Flat</option>
                 <option value="house">House</option>
                 <option value="commercial">Commercial</option>
+                <option value="plot">Plot</option>
               </select>
+            </label>
+            <label>
+              Area (sq ft)
+              <input
+                type="number"
+                min="0"
+                step="any"
+                placeholder="e.g. 1200"
+                value={form.area}
+                onChange={(event) => updateField('area', event.target.value)}
+              />
+            </label>
+            <label>
+              Total floors
+              <input
+                type="number"
+                min="0"
+                disabled={form.type === 'plot'}
+                placeholder={form.type === 'plot' ? '0 (N/A for plot)' : 'e.g. 4'}
+                value={form.type === 'plot' ? 0 : form.total_floors}
+                onChange={(event) => updateField('total_floors', event.target.value)}
+              />
+            </label>
+            <label>
+              Total rooms
+              <input
+                type="number"
+                min="0"
+                disabled={form.type === 'plot'}
+                placeholder={form.type === 'plot' ? '0 (N/A for plot)' : 'e.g. 3'}
+                value={form.type === 'plot' ? 0 : form.total_rooms}
+                onChange={(event) => updateField('total_rooms', event.target.value)}
+              />
             </label>
           </div>
           <label className="edit-property__description">
