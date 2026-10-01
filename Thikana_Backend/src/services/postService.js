@@ -121,6 +121,7 @@ export const getPublishedPosts = async () => {
       area: post.properties?.area ? Number(post.properties.area) : null,
       total_floors: post.properties?.total_floors ?? 0,
       total_rooms: post.properties?.total_rooms ?? 0,
+      views: post.properties?.views ?? 0,
       images: (post.properties?.property_images || []).map((img) => ({
         url: img.image_url,
         publicId: img.cloudinary_public_id,
@@ -175,6 +176,7 @@ export const getUserPosts = async (token) => {
       area: post.properties?.area ? Number(post.properties.area) : null,
       total_floors: post.properties?.total_floors ?? 0,
       total_rooms: post.properties?.total_rooms ?? 0,
+      views: post.properties?.views ?? 0,
       images: (post.properties?.property_images || []).map((img) => ({
         url: img.image_url,
         publicId: img.cloudinary_public_id,

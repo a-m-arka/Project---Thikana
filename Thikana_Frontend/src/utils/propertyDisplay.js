@@ -23,6 +23,7 @@ export const toCardProperty = (property) => ({
   area: property.area || null,
   total_floors: property.total_floors ?? 0,
   total_rooms: property.total_rooms ?? 0,
+  views: property.views ?? 0,
   price: Number(property.price).toLocaleString(),
   type: property.type?.slice(0, 1).toUpperCase() + property.type?.slice(1),
   postType: property.post_type

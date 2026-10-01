@@ -54,6 +54,7 @@ model properties {
   area            Decimal?          @db.Decimal(10, 2)
   total_floors    Int?              @default(0)
   total_rooms     Int?              @default(0)
+  views           Int?              @default(0)
   posts           posts[]
   users           users?            @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "properties_ibfk_1")
   property_images property_images[]

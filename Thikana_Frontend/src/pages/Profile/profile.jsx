@@ -20,7 +20,7 @@ export default function Profile() {
   const fileInputRef = useRef(null);
 
   // Stats
-  const [stats, setStats] = useState({ properties: 0, posts: 0 });
+  const [stats, setStats] = useState({ properties: 0, posts: 0, views: 0 });
   const [loadingStats, setLoadingStats] = useState(true);
 
   // Profile picture
@@ -75,9 +75,12 @@ export default function Profile() {
         }
 
         let propCount = 0;
+        let totalViews = 0;
         if (propRes.status === "fulfilled" && propRes.value.ok) {
           const propData = await propRes.value.json();
-          propCount = Array.isArray(propData.properties) ? propData.properties.length : 0;
+          const propsList = Array.isArray(propData.properties) ? propData.properties : [];
+          propCount = propsList.length;
+          totalViews = propsList.reduce((acc, p) => acc + Number(p.views || 0), 0);
         }
 
         let postCount = 0;
@@ -86,7 +89,7 @@ export default function Profile() {
           postCount = Array.isArray(postData.posts) ? postData.posts.length : 0;
         }
 
-        setStats({ properties: propCount, posts: postCount });
+        setStats({ properties: propCount, posts: postCount, views: totalViews });
       } catch {
         // preserve silent behavior
       } finally {

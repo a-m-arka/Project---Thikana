@@ -283,12 +283,13 @@ export const getAllProperties = async () => {
 };
 
 export const getPropertyById = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
   const propertyId = Number.parseInt(req.params.propertyId, 10);
   if (!Number.isInteger(propertyId) || propertyId < 1) {
     return res.status(400).json({ message: "A valid property ID is required" });
   }
   try {
-    const response = await propertyService.getPropertyById(propertyId);
+    const response = await propertyService.getPropertyById(propertyId, token);
     if (response.success) {
       return res.status(200).json({ property: response.property });
     }

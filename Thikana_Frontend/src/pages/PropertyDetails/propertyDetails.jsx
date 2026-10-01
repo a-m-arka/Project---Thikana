@@ -7,24 +7,30 @@ import './propertyDetails.scss';
 
 export default function PropertyDetails({ onMessageOwner }) {
   const { propertyId } = useParams();
-  const { apiUrl, user } = useAuth();
+  const { apiUrl, user, authenticatedFetch } = useAuth();
   const [property, setProperty] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const loadProperty = async () => {
       try {
-        const response = await fetch(`${apiUrl}/property/properties/${propertyId}`);
+        const response = await authenticatedFetch(`${apiUrl}/property/properties/${propertyId}`, {
+          signal: controller.signal,
+        });
         const data = await response.json();
 
         if (!response.ok) throw new Error(data.message || 'Unable to load this property');
         setProperty(toCardProperty(data.property));
       } catch (err) {
+        if (err.name === 'AbortError') return;
         setError(err.message);
       }
     };
 
     loadProperty();
+    return () => controller.abort();
   }, [apiUrl, propertyId]);
 
   if (error) {

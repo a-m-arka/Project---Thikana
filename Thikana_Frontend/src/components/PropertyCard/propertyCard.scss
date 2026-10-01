@@ -24,7 +24,23 @@
   object-fit: cover;
 }
 
-.property-card__image span {
+.property-card__views {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: $surface-color;
+  color: $primary-dark;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(4px);
+}
+
+.property-card__post-status {
   position: absolute;
   top: 12px;
   left: 12px;

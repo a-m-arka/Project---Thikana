@@ -1,4 +1,4 @@
-import { HiOutlineChatBubbleLeft, HiOutlineMapPin } from 'react-icons/hi2';
+import { HiOutlineChatBubbleLeft, HiOutlineMapPin, HiOutlineEye } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 import './propertyCard.scss';
 export default function PropertyCard({
@@ -7,12 +7,18 @@ export default function PropertyCard({
   actions,
   primaryAction,
   detailsInActions = false,
+  showViews = false,
 }) {
   return (
     <article className="property-card">
       <div className="property-card__image">
         <img src={property.image} alt={property.title} />
-        <span>{property.postType}</span>
+        <span className="property-card__post-status">{property.postType}</span>
+        {showViews && (
+          <span className="property-card__views" title={`${property.views ?? 0} views`}>
+            <HiOutlineEye /> {property.views ?? 0}
+          </span>
+        )}
       </div>
       <div className="property-card__body">
         <p className="property-card__type">{property.type}</p>

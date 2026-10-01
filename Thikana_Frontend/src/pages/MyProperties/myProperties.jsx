@@ -418,6 +418,7 @@ export default function MyProperties() {
             <PropertyCard
               key={p.property_id}
               property={toCardProperty(p)}
+              showViews={true}
               primaryAction={
                 p.post_id ? (
                   <span className="property-card__posted">

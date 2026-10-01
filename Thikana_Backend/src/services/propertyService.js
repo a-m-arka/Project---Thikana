@@ -341,6 +341,7 @@ export const getUserProperties = async (token) => {
         area: p.area ? Number(p.area) : null,
         total_floors: p.total_floors ?? 0,
         total_rooms: p.total_rooms ?? 0,
+        views: p.views ?? 0,
         post_id: latestPost?.post_id || null,
         post_type: latestPost?.post_type || null,
         images: p.property_images.map((img) => ({
@@ -384,6 +385,7 @@ export const getAllProperties = async () => {
       area: p.area ? Number(p.area) : null,
       total_floors: p.total_floors ?? 0,
       total_rooms: p.total_rooms ?? 0,
+      views: p.views ?? 0,
       images: p.property_images.map((img) => ({
         url: img.image_url,
         publicId: img.cloudinary_public_id,
@@ -397,9 +399,14 @@ export const getAllProperties = async () => {
   }
 };
 
-export const getPropertyById = async (propertyId) => {
+export const getPropertyById = async (propertyId, token) => {
   try {
     const propId = Number(propertyId);
+    let viewerUser = null;
+    if (token) {
+      viewerUser = await getUserFromToken(token);
+    }
+
     const p = await prisma.properties.findUnique({
       where: { property_id: propId },
       include: {
@@ -416,6 +423,16 @@ export const getPropertyById = async (propertyId) => {
       return { success: false, message: "Property not found" };
     }
 
+    // Only increment view count if viewer is NOT the owner
+    const isOwner = viewerUser && Number(viewerUser.user_id) === Number(p.user_id);
+    if (!isOwner) {
+      await prisma.properties.update({
+        where: { property_id: propId },
+        data: { views: { increment: 1 } },
+      }).catch(() => {});
+      p.views = (p.views ?? 0) + 1;
+    }
+
     const latestPost = p.posts[0] || null;
     const formattedProperty = {
       property_id: p.property_id,
@@ -430,6 +447,7 @@ export const getPropertyById = async (propertyId) => {
       area: p.area ? Number(p.area) : null,
       total_floors: p.total_floors ?? 0,
       total_rooms: p.total_rooms ?? 0,
+      views: p.views ?? 0,
       post_id: latestPost?.post_id || null,
       post_type: latestPost?.post_type || null,
       images: p.property_images.map((img) => ({
