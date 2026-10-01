@@ -245,6 +245,17 @@ export default function Profile() {
           </div>
         </div>
 
+        <div className="profile-stat-card">
+          <div className="profile-stat-card__icon">
+            <HiOutlineEye />
+          </div>
+          <div className="profile-stat-card__info">
+            <span className="profile-stat-card__value">
+              {loadingStats ? "..." : stats.views}
+            </span>
+            <span className="profile-stat-card__label">Total Property Views</span>
+          </div>
+        </div>
 
       </div>
 
