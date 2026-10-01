@@ -90,7 +90,11 @@ export default function Navbar({
           {theme === 'dark' ? <HiOutlineSun /> : <HiOutlineMoon />}
         </button>
         <button className="navbar__user" onClick={() => navigate('/app/profile')}>
-          <span>{initials}</span>
+          {user?.profile_picture_url ? (
+            <img src={user.profile_picture_url} alt={user?.name || 'User'} className="navbar__avatar-img" />
+          ) : (
+            <span>{initials}</span>
+          )}
           <strong>{user?.name || 'My account'}</strong>
         </button>
         <button

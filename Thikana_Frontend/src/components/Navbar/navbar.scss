@@ -136,3 +136,10 @@
     gap: 2px;
   }
 }
+
+.navbar__avatar-img {
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  object-fit: cover;
+}
